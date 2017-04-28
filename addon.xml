@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<addon id="plugin.video.cmore"
+       version="0.1"
+       name="C More"
+       provider-name="emilsvennesson">
+  <requires>
+    <import addon="xbmc.python" version="2.25.0"/>
+    <import addon="inputstream.adaptive" version="1.0.8"/>
+    <import addon="script.module.requests" version="2.9.1"/>
+    <import addon="script.module.iso8601" version="0.1.11"/>
+    <import addon="script.module.xmltodict" version="0.9.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.service" library="service.py" start="login" />
+  <extension point="xbmc.addon.metadata">
+    <description lang="en_GB">Watch content from C More.</description>
+    <platform>all</platform>
+    <license>MIT License</license>
+    <source>https://github.com/emilsvennesson/kodi-cmore</source>
+    <language>en</language>
+    <disclaimer>This add-on is completely unofficial and is not endorsed by C More Entertainment in any way.</disclaimer>
+    <assets>
+      <icon>resources/art/icon.png</icon>
+      <fanart>resources/art/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>
