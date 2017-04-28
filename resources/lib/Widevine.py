@@ -1,7 +1,10 @@
 import json
+
 import xmltodict
 from kodihelper import KodiHelper
+
 helper = KodiHelper()
+
 
 class Widevine(object):
     license_url = helper.c.config['settings']['drmProxy']

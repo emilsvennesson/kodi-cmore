@@ -23,25 +23,25 @@ helper.log('Port {0} selected'.format(str(wv_proxy_port)))
 # server defaults
 SocketServer.TCPServer.allow_reuse_address = True
 # configure the proxy server
-wv_proxy_server = SocketServer.TCPServer(('127.0.0.1', wv_proxy_port), WidevineHTTPRequestHandler)
-wv_proxy_server.server_activate()
-wv_proxy_server.timeout = 1
+wv_proxy = SocketServer.TCPServer(('127.0.0.1', wv_proxy_port), WidevineHTTPRequestHandler)
+wv_proxy.server_activate()
+wv_proxy.timeout = 1
 
 if __name__ == '__main__':
     monitor = Monitor()
     # start thread for proxy server
-    proxy_thread = threading.Thread(target=wv_proxy_server.serve_forever)
+    proxy_thread = threading.Thread(target=wv_proxy.serve_forever)
     proxy_thread.daemon = True
     proxy_thread.start()
 
     # kill the services if kodi monitor tells us to
     while not monitor.abortRequested():
         if monitor.waitForAbort(5):
-            wv_proxy_server.shutdown()
+            wv_proxy.shutdown()
             break
 
     # wv-proxy service shutdown sequence
-    wv_proxy_server.server_close()
-    wv_proxy_server.socket.close()
-    wv_proxy_server.shutdown()
+    wv_proxy.server_close()
+    wv_proxy.socket.close()
+    wv_proxy.shutdown()
     helper.log('wv-proxy stopped')

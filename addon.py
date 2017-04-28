@@ -8,15 +8,17 @@ base_url = sys.argv[0]
 handle = int(sys.argv[1])
 helper = KodiHelper(base_url, handle)
 
+
 def run():
     try:
-        router(sys.argv[2][1:]) # trim the leading '?' from the plugin call paramstring
+        router(sys.argv[2][1:])  # trim the leading '?' from the plugin call paramstring
     except helper.c.CMoreError as error:
         if error.value == 'SESSION_NOT_AUTHENTICATED':
             helper.login_process()
             router(sys.argv[2][1:])
         else:
             helper.dialog('ok', helper.language(30028), error.value)
+
 
 def list_pages():
     for page in helper.c.pages:
@@ -46,6 +48,7 @@ def list_pages():
 
         helper.add_item(title, params=params)
     helper.eod()
+
 
 def list_page(page, namespace, main_categories):
     if main_categories == 'true':
@@ -142,6 +145,7 @@ def list_episodes_or_seasons(page_id):
         list_seasons(series)
     else:
         list_episodes(series_data=series)
+
 
 def list_seasons(series):
     for season in series['availableSeasons']:

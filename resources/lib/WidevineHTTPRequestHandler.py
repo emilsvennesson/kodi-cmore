@@ -1,12 +1,13 @@
 import BaseHTTPServer
 import urlparse
 import urllib
+
 from Widevine import Widevine
 
 wv = Widevine()
 
-class WidevineHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
+class WidevineHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_HEAD(self):
         self.send_response(200)
 

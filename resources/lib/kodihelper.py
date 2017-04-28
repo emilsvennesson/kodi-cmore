@@ -12,6 +12,7 @@ import xbmcgui
 import xbmcplugin
 from xbmcaddon import Addon
 
+
 class KodiHelper(object):
     def __init__(self, base_url=None, handle=None):
         addon = self.get_addon()
@@ -194,8 +195,8 @@ class KodiHelper(object):
             listitem.setArt(art)
         else:
             art = {
-                'icon':  addon.getAddonInfo('icon'),
-                'fanart':  addon.getAddonInfo('fanart')
+                'icon': addon.getAddonInfo('icon'),
+                'fanart': addon.getAddonInfo('fanart')
             }
             listitem.setArt(art)
         if info:
@@ -224,7 +225,6 @@ class KodiHelper(object):
             with open(img_location, 'wb') as img:
                 img.write(image)
             return img_location
-
 
     def eod(self):
         """Tell Kodi that the end of the directory listing is reached."""
