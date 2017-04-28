@@ -6,14 +6,8 @@ import os
 import json
 import codecs
 import cookielib
-import time
-import calendar
-import uuid
-from urllib import urlencode
-from datetime import datetime, timedelta
 
 import requests
-import xmltodict
 
 
 class CMore(object):
@@ -65,11 +59,11 @@ class CMore(object):
         self.log('Headers: %s' % headers)
         try:
             if method == 'get':
-                req = self.http_session.get(url, params=params, headers=headers, verify=False)
+                req = self.http_session.get(url, params=params, headers=headers)
             elif method == 'put':
-                req = self.http_session.put(url, params=params, data=payload, headers=headers, verify=False)
+                req = self.http_session.put(url, params=params, data=payload, headers=headers)
             else:  # post
-                req = self.http_session.post(url, params=params, data=payload, headers=headers, verify=False)
+                req = self.http_session.post(url, params=params, data=payload, headers=headers)
             self.log('Response code: %s' % req.status_code)
             self.log('Response: %s' % req.content)
             self.cookie_jar.save(ignore_discard=True, ignore_expires=False)
@@ -111,7 +105,8 @@ class CMore(object):
 
         config_version = int(str(config['settings']['currentAppVersion']).replace('.', ''))
         version_to_use = int(str(self.config_version).replace('.', ''))
-        if config_version != version_to_use:
+        config_lang = config['bootstrap']['suggested_site']['locale']
+        if config_version != version_to_use or config_lang != self.country:
             self.download_config()
             config = json.load(open(self.config_path))['data']
 
@@ -274,4 +269,3 @@ class CMore(object):
         """Request the image from their image proxy. Can be extended to resize/add image effects automatically.
         See https://imageproxy.b17g.services/docs for more information."""
         return '{0}?source={1}'.format(self.config['links']['imageProxy'], image_url)
-

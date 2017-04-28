@@ -26,6 +26,6 @@ class Widevine(object):
             'kid': self.get_kid(mpd_url),
             'token': token
         }
-        license = helper.c.make_request(self.license_url, 'post', payload=json.dumps(post_data))
 
-        return license
+        wv_license = helper.c.make_request(self.license_url, 'post', payload=json.dumps(post_data))
+        return wv_license

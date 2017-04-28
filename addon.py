@@ -165,33 +165,33 @@ def list_episodes(page_id=None, season=None, series_data=None):
     else:
         series = series_data
 
-    for e in series['capiAssets']:
+    for i in series['capiAssets']:
         params = {
             'action': 'play',
-            'video_id': e['videoId']
+            'video_id': i['videoId']
         }
 
         episode_info = {
             'mediatype': 'episode',
-            'tvshowtitle': e['seriesTitle'] if 'seriesTitle' in e.keys() else e['title'].replace(': ', ''),
-            'title': e['title'].replace(': ', '').encode('utf-8'),
-            'plot': e['description'] if 'description' in e.keys() else None,
-            'year': int(e['year']) if 'year' in e.keys() else None,
-            'season': int(e['season']) if 'season' in e.keys() else None,
-            'episode': int(e['episode']) if 'episode' in e.keys() else None,
-            'genre': ', '.join(e['subCategories']),
-            'cast': e['actors'] if 'actors' in e.keys() else [],
-            'duration': e['duration']
+            'tvshowtitle': i['seriesTitle'] if 'seriesTitle' in i.keys() else i['title'].replace(': ', ''),
+            'title': i['title'].replace(': ', '').encode('utf-8'),
+            'plot': i['description'] if 'description' in i.keys() else None,
+            'year': int(i['year']) if 'year' in i.keys() else None,
+            'season': int(i['season']) if 'season' in i.keys() else None,
+            'episode': int(i['episode']) if 'episode' in i.keys() else None,
+            'genre': ', '.join(i['subCategories']),
+            'cast': i['actors'] if 'actors' in i.keys() else [],
+            'duration': i['duration']
         }
 
         episode_info['title'] = add_season_episode_to_title(episode_info['title'], episode_info['season'], episode_info['episode'])
 
         episode_art = {
-            'fanart': helper.c.get_image_url(e['landscapeImage']) if 'landscapeImage' in e.keys() else None,
-            'thumb': helper.c.get_image_url(e['landscapeImage']) if 'landscapeImage' in e.keys() else None,
-            'banner': helper.c.get_image_url(e['ultraforgeImage']) if 'ultraforgeImage' in e.keys() else None,
-            'cover': helper.c.get_image_url(e['landscapeImage']) if 'landscapeImage' in e.keys() else None,
-            'poster': helper.c.get_image_url(e['posterImage']) if 'posterImage' in e.keys() else None
+            'fanart': helper.c.get_image_url(i['landscapeImage']) if 'landscapeImage' in i.keys() else None,
+            'thumb': helper.c.get_image_url(i['landscapeImage']) if 'landscapeImage' in i.keys() else None,
+            'banner': helper.c.get_image_url(i['ultraforgeImage']) if 'ultraforgeImage' in i.keys() else None,
+            'cover': helper.c.get_image_url(i['landscapeImage']) if 'landscapeImage' in i.keys() else None,
+            'poster': helper.c.get_image_url(i['posterImage']) if 'posterImage' in i.keys() else None
         }
 
         helper.add_item(episode_info['title'], params=params, info=episode_info, art=episode_art, content='episodes', playable=True)
@@ -222,8 +222,8 @@ def router(paramstring):
         if 'setting' in params:
             if params['setting'] == 'get_operator':
                 helper.get_operator()
-            elif params['setting'] == 'get_country':
-                helper.get_country()
+            elif params['setting'] == 'set_country':
+                helper.set_country()
             elif params['setting'] == 'reset_credentials':
                 helper.reset_credentials()
         elif 'action' in params:
