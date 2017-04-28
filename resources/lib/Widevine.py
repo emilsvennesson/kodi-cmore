@@ -17,16 +17,9 @@ class Widevine(object):
                         kid = cenc['@cenc:default_KID']
                         return kid
 
-    def get_drm_info(self, challenge):
-        """Converts the Widevine challenge to the format used by the C More Widevine proxy."""
-        drm_info = []
-        for byte in bytearray(challenge):
-            drm_info.append(byte)
-        return drm_info
-
-    def get_license(self, mpd_url, challenge, token):
+    def get_license(self, mpd_url, wv_challenge, token):
         post_data = {
-            'drm_info': self.get_drm_info(challenge),
+            'drm_info': [x for x in bytearray(wv_challenge)],  # convert challenge to a list of bytes
             'kid': self.get_kid(mpd_url),
             'token': token
         }
