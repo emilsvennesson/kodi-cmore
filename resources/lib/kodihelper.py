@@ -241,3 +241,9 @@ class KodiHelper(object):
             wv_proxy_url = '{0}?mpd_url={1}&license_url={2}'.format(wv_proxy_base, stream['mpd_url'], stream['license_url'])
             playitem.setProperty('inputstream.adaptive.license_key', wv_proxy_url + '||R{SSM}|')
         xbmcplugin.setResolvedUrl(self.handle, True, listitem=playitem)
+
+    def get_as_bool(self, string):
+        if string == 'true':
+            return True
+        else:
+            return False

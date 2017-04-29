@@ -43,60 +43,67 @@ def list_pages():
             'action': 'list_page',
             'page': page,
             'namespace': 'page',
-            'main_categories': 'true'
+            'root_page': 'true'
         }
 
         helper.add_item(title, params=params)
     helper.eod()
 
 
-def list_page(page, namespace, main_categories):
-    if main_categories == 'true':
-        main_categories = True
+def list_page(page=None, namespace=None, root_page=False, page_data=None):
+    if page_data:
+        page = json.loads(page_data)
     else:
-        main_categories = False
-    page = helper.c.parse_page(page, namespace, main_categories)
+        page = helper.c.parse_page(page, namespace, helper.get_as_bool(root_page))
 
     for i in page:
-        params = {'page': i.get('id')}
-        if 'videoId' in i.keys() or 'displayableDate' in i.keys():
-            list_page_items(json.dumps(page))
-            return True
-        elif 'namespace' in i.keys():
-            title = i['headline']
-            params['action'] = 'list_page'
-            params['namespace'] = i['namespace']
-            params['main_categories'] = 'false'
-        elif 'item_data' in i.keys():
-            headline = i['attributes']['headline'].encode('utf-8')
-            if i['attributes'].get('subtitle'):
-                subtitle = i['attributes']['subtitle'].encode('utf-8')
-                title = '{0}: {1}'.format(subtitle, headline)
-            else:
-                title = headline
-            params['action'] = 'list_page_items'
-            params['item_data'] = json.dumps(i['item_data'])
-        helper.add_item(title, params)
-    helper.eod()
-
-
-def list_page_items(item_data):
-    for i in json.loads(item_data):
-        if i.get('type') == 'movie':
-            list_movie(i)
-        elif i.get('type') == 'series':
-            list_show(i)
-        elif i.get('type') == 'live_event':
-            list_live_event(i)
+        page = i.get('id')
+        if i.get('videoId'):
+            if i.get('type') == 'movie':
+                list_movie(i)
+            elif i.get('type') == 'series':
+                list_show(i)
+            elif i.get('type') == 'live_event':
+                list_live_event(i)
         elif 'displayableDate' in i.keys():
             list_event_date(i)
+        elif 'namespace' in i.keys():
+            list_genres(i, page)
+        elif 'page_data' in i.keys():
+            list_genre_containers(i)
     helper.eod()
+
+def list_genres(i, page):
+    params = {
+        'action': 'list_page',
+        'namespace': i['namespace'],
+        'page': page,
+        'root_page': 'false'
+    }
+
+    helper.add_item(i['headline'], params)
+
+
+def list_genre_containers(i):
+    headline = i['attributes']['headline'].encode('utf-8')
+    if i['attributes'].get('subtitle'):
+        subtitle = i['attributes']['subtitle'].encode('utf-8')
+        title = '{0}: {1}'.format(subtitle, headline)
+    else:
+        title = headline
+
+    params = {
+        'action': 'list_page_with_page_data',
+        'page_data': json.dumps(i['page_data'])
+    }
+
+    helper.add_item(title, params)
 
 
 def list_event_date(date):
     params = {
-        'action': 'list_page_items',
-        'item_data': json.dumps(date['events'])
+        'action': 'list_page_with_page_data',
+        'page_data': json.dumps(date['events'])
     }
 
     helper.add_item(date['displayableDate'], params)
@@ -319,9 +326,9 @@ def router(paramstring):
             elif params['action'] == 'play':
                 helper.play_item(params['video_id'])
             elif params['action'] == 'list_page':
-                list_page(params['page'], params['namespace'], params['main_categories'])
-            elif params['action'] == 'list_page_items':
-                list_page_items(params['item_data'])
+                list_page(params['page'], params['namespace'], params['root_page'])
+            elif params['action'] == 'list_page_with_page_data':
+                list_page(page_data=params['page_data'])
             elif params['action'] == 'list_episodes_or_seasons':
                 list_episodes_or_seasons(params['page_id'])
             elif params['action'] == 'list_episodes':

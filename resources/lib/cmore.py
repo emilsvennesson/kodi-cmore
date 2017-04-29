@@ -215,13 +215,15 @@ class CMore(object):
 
         return json.loads(data)['data']
 
-    def parse_page(self, page_id, namespace='page', main_categories=True):
+    def parse_page(self, page_id, namespace='page', root_page=False):
         page = self.get_page(page_id, namespace)
         if 'targets' in page.keys():
-            return page['targets']
-        elif page['containers']['page_link_container']['pageLinks'] and main_categories:
+            return page['targets']  # return movie/series items on theme-pages
+        elif 'nowPlaying' in page.keys():
+            return page['nowPlaying']  # return tv channels/program info
+        elif page['containers']['page_link_container']['pageLinks'] and root_page: # return genres (action, drama) etc
             return page['containers']['page_link_container']['pageLinks']
-        elif 'genre_containers' in page['containers']:
+        elif 'genre_containers' in page['containers']:  # build genre containers
             categories = []
             for i in page['containers']['genre_containers']:
                 if i['pageLink']['id']:
@@ -230,12 +232,12 @@ class CMore(object):
                     category = {
                         'id': i['id'],
                         'attributes': i['attributes'],
-                        'item_data': i['targets']
+                        'page_data': i['targets']
 
                     }
                     categories.append(category)
             return categories
-        elif 'scheduledEvents' in page.keys():
+        elif 'scheduledEvents' in page.keys():  # return sports events
             return page['scheduledEvents']
         else:
             self.log('Failed to parse page.')
