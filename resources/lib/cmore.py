@@ -6,6 +6,8 @@ import os
 import json
 import codecs
 import cookielib
+import time
+from datetime import datetime
 
 import requests
 
@@ -277,3 +279,13 @@ class CMore(object):
             return '{0}?source={1}'.format(self.config['links']['imageProxy'], image_url)
         else:
             return None
+
+    def parse_datetime(self, event_date):
+        """Parse date string to datetime object."""
+        date_time_format = '%Y-%m-%dT%H:%M:%S+02:00'
+        datetime_obj = datetime(*(time.strptime(event_date, date_time_format)[0:6]))
+        return datetime_obj
+
+    def get_current_time(self):
+        """Return the current local time."""
+        return datetime.now()

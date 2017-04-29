@@ -102,12 +102,21 @@ def list_event_date(date):
     helper.add_item(date['displayableDate'], params)
 
 
-def list_live_event(event):
-    params = {
-        'action': 'play',
-        'video_id': event['videoId']
-    }
+def coloring(text, meaning):
+    """Return the text wrapped in appropriate color markup."""
+    if meaning == 'channel':
+        color = 'FF0FE8F0'
+    elif meaning == 'live':
+        color = 'FF03F12F'
+    elif meaning == 'upcoming':
+        color = 'FFF16C00'
 
+    colored_text = '[COLOR=%s]%s[/COLOR]' % (color, text)
+
+    return colored_text
+
+
+def list_live_event(event):
     if event.get('commentators'):
         if ',' in event.get('commentators'):
             commentators = event.get('commentators').split(',')
@@ -115,6 +124,20 @@ def list_live_event(event):
             commentators = [event['commentators']]
     else:
         commentators = []
+
+    if helper.c.parse_datetime(event['startTime']) > helper.c.get_current_time():
+        event_status = 'upcoming'
+        params = {'action': 'noop'}
+        playable = False
+    else:
+        event_status = 'live'
+        params = {
+            'action': 'play',
+            'video_id': event['videoId']
+        }
+        playable = True
+
+    list_title = '[B]{0}:[/B] {1}'.format(coloring(event['displayableStartTime'].encode('utf-8'), event_status), event['title'].encode('utf-8'))
 
     event_info = {
         'mediatype': 'video',
@@ -133,7 +156,7 @@ def list_live_event(event):
         'icon': helper.c.get_image_url(event.get('categoryIcon'))
     }
 
-    helper.add_item(event['title'], params=params, info=event_info, art=event_art, content='episodes', playable=True)
+    helper.add_item(list_title, params=params, info=event_info, art=event_art, content='episodes', playable=playable)
 
 
 def list_movie(movie):
