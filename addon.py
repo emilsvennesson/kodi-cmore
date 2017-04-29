@@ -314,7 +314,9 @@ def router(paramstring):
             helper.reset_credentials()
     elif 'action' in params:
         if helper.check_for_prerequisites():
-            if params['action'] == 'play':
+            if params['action'] == 'noop':
+                pass
+            elif params['action'] == 'play':
                 helper.play_item(params['video_id'])
             elif params['action'] == 'list_page':
                 list_page(params['page'], params['namespace'], params['main_categories'])
