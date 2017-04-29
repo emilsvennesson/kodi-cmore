@@ -311,7 +311,7 @@ def list_episodes(page_id=None, season=None, series_data=None):
             'episode': int(i['episode']) if i.get('episode') else None,
             'genre': ', '.join(i['subCategories']) if i.get('subCategories') else None,
             'cast': i.get('actors') if i.get('actors') else [],
-            'duration': i.get(['duration'])
+            'duration': i.get('duration')
         }
 
         episode_info['title'] = add_season_episode_to_title(title, episode_info['season'], episode_info['episode'])
