@@ -21,7 +21,7 @@ def run():
 
 
 def list_pages():
-    for page in helper.c.pages:
+    for page in helper.c.pages[helper.c.country]:
         if page == 'start':
             title = helper.language(30020)
         elif page == 'movies':
