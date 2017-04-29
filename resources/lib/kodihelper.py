@@ -24,7 +24,7 @@ class KodiHelper(object):
         self.logging_prefix = '[%s-%s]' % (self.addon_name, self.addon_version)
         if not xbmcvfs.exists(self.addon_profile):
             xbmcvfs.mkdir(self.addon_profile)
-        self.c = CMore(self.addon_profile, self.get_setting('country'), True)
+        self.c = CMore(self.addon_profile, self.get_setting('locale'), True)
 
     def get_addon(self):
         """Returns a fresh addon instance."""
@@ -84,7 +84,7 @@ class KodiHelper(object):
             return None
 
     def check_for_prerequisites(self):
-        if self.set_country(self.get_setting('country')) and self.set_login_credentials() and self.check_for_credentials():
+        if self.set_locale(self.get_setting('locale')) and self.set_login_credentials() and self.check_for_credentials():
             return True
         else:
             return False
@@ -143,18 +143,18 @@ class KodiHelper(object):
         else:
             return False
 
-    def set_country(self, country=None):
+    def set_locale(self, locale=None):
         countries = ['sv_SE', 'da_DK', 'nb_NO', 'fi_FI']
-        if not country:
+        if not locale:
             options = [self.language(30013), self.language(30014), self.language(30015), self.language(30016)]
-            selected_country = self.dialog('select', self.language(30012), options=options)
-            if selected_country is None:
-                selected_country = 0  # default to .se
-            self.set_setting('country_title', options[selected_country])
-            self.set_setting('country', countries[selected_country])
-            if selected_country == 3:
+            selected_locale = self.dialog('select', self.language(30012), options=options)
+            if selected_locale is None:
+                selected_locale = 0  # default to .se
+            self.set_setting('locale_title', options[selected_locale])
+            self.set_setting('locale', countries[selected_locale])
+            if selected_locale == 3:
                 self.set_setting('tv_provider_login', 'false')  # fi_FI doesn't have any tv providers
-            self.reset_credentials()  # reset credentials when country is changed
+            self.reset_credentials()  # reset credentials when locale is changed
 
         return True
 

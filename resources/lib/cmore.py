@@ -13,10 +13,10 @@ import requests
 
 
 class CMore(object):
-    def __init__(self, settings_folder, country, debug=False):
+    def __init__(self, settings_folder, locale, debug=False):
         self.debug = debug
-        self.country = country
-        self.domain_suffix = self.country.split('_')[1].lower()
+        self.locale = locale
+        self.locale_suffix = self.locale.split('_')[1].lower()
         self.http_session = requests.Session()
         self.settings_folder = settings_folder
         self.cookie_jar = cookielib.LWPCookieJar(os.path.join(self.settings_folder, 'cookie_file'))
@@ -114,7 +114,7 @@ class CMore(object):
         config_version = int(str(config['settings']['currentAppVersion']).replace('.', ''))
         version_to_use = int(str(self.config_version).replace('.', ''))
         config_lang = config['bootstrap']['suggested_site']['locale']
-        if config_version != version_to_use or config_lang != self.country:
+        if config_version != version_to_use or config_lang != self.locale:
             self.download_config()
             config = json.load(open(self.config_path))['data']
 
@@ -125,7 +125,7 @@ class CMore(object):
         url = self.base_url + '/configuration'
         params = {
             'device': 'android_tab',
-            'locale': self.country
+            'locale': self.locale
         }
         config_data = self.make_request(url, 'get', params=params)
         with open(self.config_path, 'w') as fh_config:
@@ -158,7 +158,7 @@ class CMore(object):
         url = self.config['links']['accountAPI'] + 'operators'
         params = {
             'client': self.client,
-            'country_code': self.domain_suffix
+            'country_code': self.locale_suffix
         }
         data = self.make_request(url, 'get', params=params)
 
@@ -174,7 +174,7 @@ class CMore(object):
         if self.get_credentials().get('remember_me'):  # TODO: find out when token expires
             method = 'put'
             payload = {
-                'locale': self.country,
+                'locale': self.locale,
                 'remember_me': self.get_credentials()['remember_me']['token']
             }
         else:
@@ -184,7 +184,7 @@ class CMore(object):
                 'password': password
             }
             if operator:
-                payload['country_code'] = self.domain_suffix
+                payload['country_code'] = self.locale_suffix
                 payload['operator'] = operator
 
 
@@ -194,7 +194,7 @@ class CMore(object):
     def get_page(self, page_id, namespace='page'):
         url = self.config['links']['pageAPI'] + page_id
         params = {
-            'locale': self.country,
+            'locale': self.locale,
             'namespace': namespace
         }
         headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('jwt_token'))}
@@ -204,7 +204,7 @@ class CMore(object):
 
     def get_contentdetails(self, page_type, page_id, season=None, size='999', page='1'):
         url = self.config['links']['contentDetailsAPI'] + '{0}/{1}'.format(page_type, page_id)
-        params = {'locale': self.country}
+        params = {'locale': self.locale}
         if season:
             params['season'] = season
             params['size'] = size
@@ -256,7 +256,7 @@ class CMore(object):
         url = self.config['links']['personalizationAPI'] + 'unfinished_assets'
         params = {
             'limit': limit,
-            'locale': self.country
+            'locale': self.locale
         }
         headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('jwt_token'))}
         data = self.make_request(url, 'get', params=params, headers=headers)

@@ -21,7 +21,7 @@ def run():
 
 
 def list_pages():
-    for page in helper.c.pages[helper.c.country]:
+    for page in helper.c.pages[helper.c.locale]:
         if page == 'start':
             title = helper.language(30020)
         elif page == 'movies':
@@ -67,10 +67,10 @@ def list_page(page=None, namespace=None, root_page=False, page_data=None):
                 list_live_event(i)
         elif 'displayableDate' in i.keys():
             list_event_date(i)
-        elif 'namespace' in i.keys():
+        elif 'namespace' in i.keys():  # theme pages
             list_genres(i, page)
-        elif 'page_data' in i.keys():
-            list_genre_containers(i)
+        elif 'page_data' in i.keys():  # parsed containers
+            list_containers(i)
     helper.eod()
 
 def list_genres(i, page):
@@ -84,7 +84,7 @@ def list_genres(i, page):
     helper.add_item(i['headline'], params)
 
 
-def list_genre_containers(i):
+def list_containers(i):
     headline = i['attributes']['headline'].encode('utf-8')
     if i['attributes'].get('subtitle'):
         subtitle = i['attributes']['subtitle'].encode('utf-8')
@@ -315,8 +315,8 @@ def router(paramstring):
     if 'setting' in params:
         if params['setting'] == 'get_operator':
             helper.get_operator()
-        elif params['setting'] == 'set_country':
-            helper.set_country()
+        elif params['setting'] == 'set_locale':
+            helper.set_locale()
         elif params['setting'] == 'reset_credentials':
             helper.reset_credentials()
     elif 'action' in params:
