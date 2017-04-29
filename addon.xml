@@ -7,7 +7,6 @@
     <import addon="xbmc.python" version="2.25.0"/>
     <import addon="inputstream.adaptive" version="1.0.8"/>
     <import addon="script.module.requests" version="2.9.1"/>
-    <import addon="script.module.iso8601" version="0.1.11"/>
     <import addon="script.module.xmltodict" version="0.9.0"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">
