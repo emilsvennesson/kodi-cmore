@@ -145,9 +145,9 @@ def list_movie(movie):
     movie_info = {
         'mediatype': 'movie',
         'title': movie['title'],
-        'genre': movie['caption'].split(',')[0],
+        'genre': extract_genre_year(movie.get('caption'), 'genre'),
         'duration': movie['duration'],
-        'year': int(movie['caption'].split(', ')[1])
+        'year': int(extract_genre_year(movie.get('caption'), 'year'))
     }
 
     movie_art = {
@@ -161,6 +161,22 @@ def list_movie(movie):
     helper.add_item(movie['title'], params=params, info=movie_info, art=movie_art, content='movies', playable=True)
 
 
+def extract_genre_year(caption, what_to_extract):
+    """Try to extract the genre or year from the caption."""
+    if what_to_extract == 'year':
+        list_index = 1
+    else:
+        list_index = 0
+
+    if caption:
+        try:
+            return caption.split(', ')[list_index]
+        except IndexError:
+            pass
+
+    return None
+
+
 def list_show(show):
     params = {
         'action': 'list_episodes_or_seasons',
@@ -170,9 +186,9 @@ def list_show(show):
     show_info = {
         'mediatype': 'tvshow',
         'title': show['title'],
-        'genre': show['caption'].split(',')[0],
+        'genre': extract_genre_year(show.get('caption'), 'genre'),
         'duration': show['duration'],
-        'year': int(show['caption'].split(', ')[1])
+        'year': extract_genre_year(show.get('caption'), 'year')
     }
 
     show_art = {
