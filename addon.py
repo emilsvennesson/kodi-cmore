@@ -47,18 +47,23 @@ def list_pages():
         }
 
         helper.add_item(title, params=params)
+    helper.add_item(helper.language(30030), params={'action': 'search'})  # search
     helper.eod()
 
 
-def list_page(page=None, namespace=None, root_page=False, page_data=None):
+def list_page(page=None, namespace=None, root_page=False, page_data=None, search=False):
     if page_data:
-        page = json.loads(page_data)
+        if not isinstance(page_data, list):  # we supply the data as a list for search queries
+            page = json.loads(page_data)
+        else:
+            page = page_data
     else:
         page = helper.c.parse_page(page, namespace, helper.get_as_bool(root_page))
 
     for i in page:
         page = i.get('id')
-        if i.get('videoId'):
+        # search queries doesn't include the videoId in response
+        if i.get('videoId') or search:
             if i.get('type') == 'movie':
                 list_movie(i)
             elif i.get('type') == 'series':
@@ -244,7 +249,7 @@ def list_show(show):
         'mediatype': 'tvshow',
         'title': show['title'],
         'genre': extract_genre_year(show.get('caption'), 'genre'),
-        'duration': show['duration'],
+        'duration': show.get('duration'),
         'year': extract_genre_year(show.get('caption'), 'year')
     }
 
@@ -335,6 +340,14 @@ def add_season_episode_to_title(title, season, episode):
         helper.log('No season/episode information found.')
         return title
 
+def search():
+    query = helper.get_user_input(helper.language(30030))
+    if query:
+        list_page(page_data=helper.c.get_search_data(query), search=True)
+    else:
+        helper.log('No search query provided.')
+        return False
+
 
 def router(paramstring):
     """Router function that calls other functions depending on the provided paramstring."""
@@ -360,6 +373,8 @@ def router(paramstring):
                 list_episodes_or_seasons(params['page_id'])
             elif params['action'] == 'list_episodes':
                 list_episodes(page_id=params['page_id'], season=params['season'])
+            elif params['action'] == 'search':
+                search()
     else:
         if helper.check_for_prerequisites():
             list_pages()

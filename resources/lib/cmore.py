@@ -296,6 +296,19 @@ class CMore(object):
         else:
             return None
 
+    def get_search_data(self, query, page='0', page_size='300'):
+        url = self.config['links']['searchAPI']
+        params = {
+            'query': query,
+            'page': page,
+            'pageSize': page_size,
+            'locale': self.locale
+        }
+        headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('jwt_token'))}
+        data = self.make_request(url, 'get', params=params, headers=headers)
+
+        return json.loads(data)['data']['hits']
+
     def parse_datetime(self, event_date):
         """Parse date string to datetime object."""
         date_time_format = '%Y-%m-%dT%H:%M:%S+02:00'
