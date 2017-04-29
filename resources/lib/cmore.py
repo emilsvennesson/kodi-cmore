@@ -213,7 +213,7 @@ class CMore(object):
             return page['targets']
         elif page['containers']['page_link_container']['pageLinks'] and main_categories:
             return page['containers']['page_link_container']['pageLinks']
-        else:
+        elif 'genre_containers' in page['containers']:
             categories = []
             for i in page['containers']['genre_containers']:
                 if i['pageLink']['id']:
@@ -226,8 +226,13 @@ class CMore(object):
 
                     }
                     categories.append(category)
-
             return categories
+        elif 'scheduledEvents' in page.keys():
+            return page['scheduledEvents']
+        else:
+            self.log('Failed to parse page.')
+            return False
+
 
     def get_unfinished_assets(self, limit=200):
         url = self.config['links']['personalizationAPI'] + 'unfinished_assets'
@@ -268,4 +273,7 @@ class CMore(object):
     def get_image_url(self, image_url):
         """Request the image from their image proxy. Can be extended to resize/add image effects automatically.
         See https://imageproxy.b17g.services/docs for more information."""
-        return '{0}?source={1}'.format(self.config['links']['imageProxy'], image_url)
+        if image_url:
+            return '{0}?source={1}'.format(self.config['links']['imageProxy'], image_url)
+        else:
+            return None

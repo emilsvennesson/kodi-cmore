@@ -58,8 +58,8 @@ def list_page(page, namespace, main_categories):
     page = helper.c.parse_page(page, namespace, main_categories)
 
     for i in page:
-        params = {'page': i['id']}
-        if 'videoId' in i.keys():
+        params = {'page': i.get('id')}
+        if 'videoId' in i.keys() or 'displayableDate' in i.keys():
             list_page_items(json.dumps(page))
             return True
         elif 'namespace' in i.keys():
@@ -82,11 +82,58 @@ def list_page(page, namespace, main_categories):
 
 def list_page_items(item_data):
     for i in json.loads(item_data):
-        if i['type'] == 'movie':
+        if i.get('type') == 'movie':
             list_movie(i)
-        elif i['type'] == 'series':
+        elif i.get('type') == 'series':
             list_show(i)
+        elif i.get('type') == 'live_event':
+            list_live_event(i)
+        elif 'displayableDate' in i.keys():
+            list_event_date(i)
     helper.eod()
+
+
+def list_event_date(date):
+    params = {
+        'action': 'list_page_items',
+        'item_data': json.dumps(date['events'])
+    }
+
+    helper.add_item(date['displayableDate'], params)
+
+
+def list_live_event(event):
+    params = {
+        'action': 'play',
+        'video_id': event['videoId']
+    }
+
+    if event.get('commentators'):
+        if ',' in event.get('commentators'):
+            commentators = event.get('commentators').split(',')
+        else:
+            commentators = [event['commentators']]
+    else:
+        commentators = []
+
+    event_info = {
+        'mediatype': 'video',
+        'plot': event.get('description'),
+        'plotoutline': event.get('caption'),
+        'year': int(event['year']) if event.get('year') else None,
+        'genre': ', '.join(event['subCategories']) if event.get('subCategories') else None,
+        'cast': commentators
+    }
+
+    event_art = {
+        'fanart': helper.c.get_image_url(event.get('landscapeImage')),
+        'thumb': helper.c.get_image_url(event.get('landscapeImage')),
+        'banner': helper.c.get_image_url(event.get('ultraforgeImage')),
+        'cover': helper.c.get_image_url(event.get('landscapeImage')),
+        'icon': helper.c.get_image_url(event.get('categoryIcon'))
+    }
+
+    helper.add_item(event['title'], params=params, info=event_info, art=event_art, content='episodes', playable=True)
 
 
 def list_movie(movie):
@@ -104,11 +151,11 @@ def list_movie(movie):
     }
 
     movie_art = {
-        'fanart': helper.c.get_image_url(movie['landscapeImage']) if 'landscapeImage' in movie.keys() else None,
-        'thumb': helper.c.get_image_url(movie['posterImage']) if 'posterImage' in movie.keys() else None,
-        'banner': helper.c.get_image_url(movie['ultraforgeImage']) if 'ultraforgeImage' in movie.keys() else None,
-        'cover': helper.c.get_image_url(movie['landscapeImage']) if 'landscapeImage' in movie.keys() else None,
-        'poster': helper.c.get_image_url(movie['posterImage']) if 'posterImage' in movie.keys() else None
+        'fanart': helper.c.get_image_url(movie.get('landscapeImage')),
+        'thumb': helper.c.get_image_url(movie.get('posterImage')),
+        'banner': helper.c.get_image_url(movie.get('ultraforgeImage')),
+        'cover': helper.c.get_image_url(movie.get('landscapeImage')),
+        'poster': helper.c.get_image_url(movie.get('posterImage'))
     }
 
     helper.add_item(movie['title'], params=params, info=movie_info, art=movie_art, content='movies', playable=True)
@@ -129,11 +176,11 @@ def list_show(show):
     }
 
     show_art = {
-        'fanart': helper.c.get_image_url(show['landscapeImage']) if 'landscapeImage' in show.keys() else None,
-        'thumb': helper.c.get_image_url(show['posterImage']) if 'posterImage' in show.keys() else None,
-        'banner': helper.c.get_image_url(show['ultraforgeImage']) if 'ultraforgeImage' in show.keys() else None,
-        'cover': helper.c.get_image_url(show['landscapeImage']) if 'landscapeImage' in show.keys() else None,
-        'poster': helper.c.get_image_url(show['posterImage']) if 'posterImage' in show.keys() else None
+        'fanart': helper.c.get_image_url(show.get('landscapeImage')),
+        'thumb': helper.c.get_image_url(show.get('posterImage')),
+        'banner': helper.c.get_image_url(show.get('ultraforgeImage')),
+        'cover': helper.c.get_image_url(show.get('landscapeImage')),
+        'poster': helper.c.get_image_url(show.get('posterImage'))
     }
 
     helper.add_item(show['title'], params=params, info=show_info, art=show_art, content='tvshows')
@@ -171,27 +218,28 @@ def list_episodes(page_id=None, season=None, series_data=None):
             'video_id': i['videoId']
         }
 
+        title = i['title'].replace(': ', '').encode('utf-8')
+
         episode_info = {
             'mediatype': 'episode',
-            'tvshowtitle': i['seriesTitle'] if 'seriesTitle' in i.keys() else i['title'].replace(': ', ''),
-            'title': i['title'].replace(': ', '').encode('utf-8'),
-            'plot': i['description'] if 'description' in i.keys() else None,
-            'year': int(i['year']) if 'year' in i.keys() else None,
-            'season': int(i['season']) if 'season' in i.keys() else None,
-            'episode': int(i['episode']) if 'episode' in i.keys() else None,
-            'genre': ', '.join(i['subCategories']),
-            'cast': i['actors'] if 'actors' in i.keys() else [],
+            'tvshowtitle': i['seriesTitle'] if i.get('seriesTitle') else title,
+            'plot': i.get('description'),
+            'year': int(i['year']) if i.get('year') else None,
+            'season': int(i['season']) if i.get('season') else None,
+            'episode': int(i['episode']) if i.get('episode') else None,
+            'genre': ', '.join(i['subCategories']) if i.get('subCategories') else None,
+            'cast': i.get('actors') if i.get('actors') else [],
             'duration': i['duration']
         }
 
-        episode_info['title'] = add_season_episode_to_title(episode_info['title'], episode_info['season'], episode_info['episode'])
+        episode_info['title'] = add_season_episode_to_title(title, episode_info['season'], episode_info['episode'])
 
         episode_art = {
-            'fanart': helper.c.get_image_url(i['landscapeImage']) if 'landscapeImage' in i.keys() else None,
-            'thumb': helper.c.get_image_url(i['landscapeImage']) if 'landscapeImage' in i.keys() else None,
-            'banner': helper.c.get_image_url(i['ultraforgeImage']) if 'ultraforgeImage' in i.keys() else None,
-            'cover': helper.c.get_image_url(i['landscapeImage']) if 'landscapeImage' in i.keys() else None,
-            'poster': helper.c.get_image_url(i['posterImage']) if 'posterImage' in i.keys() else None
+            'fanart': helper.c.get_image_url(i.get('landscapeImage')),
+            'thumb': helper.c.get_image_url(i.get('landscapeImage')),
+            'banner': helper.c.get_image_url(i.get('ultraforgeImage')),
+            'cover': helper.c.get_image_url(i.get('landscapeImage')),
+            'poster': helper.c.get_image_url(i.get('posterImage'))
         }
 
         helper.add_item(episode_info['title'], params=params, info=episode_info, art=episode_art, content='episodes', playable=True)
