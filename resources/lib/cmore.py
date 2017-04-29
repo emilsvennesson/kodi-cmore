@@ -218,30 +218,38 @@ class CMore(object):
     def parse_page(self, page_id, namespace='page', root_page=False):
         page = self.get_page(page_id, namespace)
         if 'targets' in page.keys():
-            return page['targets']  # return movie/series items on theme-pages
+            return page['targets']  # movie/series items on theme-pages
         elif 'nowPlaying' in page.keys():
-            return page['nowPlaying']  # return tv channels/program info
-        elif page['containers']['page_link_container']['pageLinks'] and root_page: # return genres (action, drama) etc
-            return page['containers']['page_link_container']['pageLinks']
-        elif 'genre_containers' in page['containers']:  # build genre containers
-            categories = []
-            for i in page['containers']['genre_containers']:
-                if i['pageLink']['id']:
-                    categories.append(i['pageLink'])
-                else:
-                    category = {
-                        'id': i['id'],
-                        'attributes': i['attributes'],
-                        'page_data': i['targets']
-
-                    }
-                    categories.append(category)
-            return categories
-        elif 'scheduledEvents' in page.keys():  # return sports events
-            return page['scheduledEvents']
+            return page['nowPlaying']  # tv channels/program info
+        elif 'scheduledEvents' in page.keys():
+            return page['scheduledEvents']  # sports events
+        elif page.get('containers'):
+            if 'genre_containers' in page['containers'].keys():
+                return self.parse_containers(page['containers']['genre_containers'])
+            elif 'section_containers' in page['containers'].keys():
+                return self.parse_containers(page['containers']['section_containers'])
+            elif page['containers']['page_link_container']['pageLinks'] and root_page:
+                # no parsing needed as it's already in the 'correct' format
+                return page['containers']['page_link_container']['pageLinks']
         else:
             self.log('Failed to parse page.')
             return False
+
+    def parse_containers(self, containers):
+        parsed_containers = []
+        for i in containers:
+            if i['pageLink']['id']:
+                parsed_containers.append(i['pageLink'])
+            else:
+                container = {
+                    'id': i['id'],
+                    'attributes': i['attributes'],
+                    'page_data': i['targets']
+
+                }
+                parsed_containers.append(container)
+
+        return parsed_containers
 
 
     def get_unfinished_assets(self, limit=200):
