@@ -207,8 +207,10 @@ def list_movie(movie):
     movie_info = {
         'mediatype': 'movie',
         'title': movie['title'],
+        'plot': movie.get('description'),
+        'cast': movie.get('actors') if movie.get('actors') else [],
         'genre': extract_genre_year(movie.get('caption'), 'genre'),
-        'duration': movie['duration'],
+        'duration': movie.get('duration'),
         'year': int(extract_genre_year(movie.get('caption'), 'year'))
     }
 
@@ -248,6 +250,8 @@ def list_show(show):
     show_info = {
         'mediatype': 'tvshow',
         'title': show['title'],
+        'plot': show.get('description'),
+        'cast': show.get('actors') if show.get('actors') else [],
         'genre': extract_genre_year(show.get('caption'), 'genre'),
         'duration': show.get('duration'),
         'year': extract_genre_year(show.get('caption'), 'year')
@@ -307,7 +311,7 @@ def list_episodes(page_id=None, season=None, series_data=None):
             'episode': int(i['episode']) if i.get('episode') else None,
             'genre': ', '.join(i['subCategories']) if i.get('subCategories') else None,
             'cast': i.get('actors') if i.get('actors') else [],
-            'duration': i['duration']
+            'duration': i.get(['duration'])
         }
 
         episode_info['title'] = add_season_episode_to_title(title, episode_info['season'], episode_info['episode'])
