@@ -305,26 +305,25 @@ def add_season_episode_to_title(title, season, episode):
 def router(paramstring):
     """Router function that calls other functions depending on the provided paramstring."""
     params = dict(urlparse.parse_qsl(paramstring))
-    if params:
-        if 'setting' in params:
-            if params['setting'] == 'get_operator':
-                helper.get_operator()
-            elif params['setting'] == 'set_country':
-                helper.set_country()
-            elif params['setting'] == 'reset_credentials':
-                helper.reset_credentials()
-        elif 'action' in params:
-            if helper.check_for_prerequisites():
-                if params['action'] == 'play':
-                    helper.play_item(params['video_id'])
-                elif params['action'] == 'list_page':
-                    list_page(params['page'], params['namespace'], params['main_categories'])
-                elif params['action'] == 'list_page_items':
-                    list_page_items(params['item_data'])
-                elif params['action'] == 'list_episodes_or_seasons':
-                    list_episodes_or_seasons(params['page_id'])
-                elif params['action'] == 'list_episodes':
-                    list_episodes(page_id=params['page_id'], season=params['season'])
+    if 'setting' in params:
+        if params['setting'] == 'get_operator':
+            helper.get_operator()
+        elif params['setting'] == 'set_country':
+            helper.set_country()
+        elif params['setting'] == 'reset_credentials':
+            helper.reset_credentials()
+    elif 'action' in params:
+        if helper.check_for_prerequisites():
+            if params['action'] == 'play':
+                helper.play_item(params['video_id'])
+            elif params['action'] == 'list_page':
+                list_page(params['page'], params['namespace'], params['main_categories'])
+            elif params['action'] == 'list_page_items':
+                list_page_items(params['item_data'])
+            elif params['action'] == 'list_episodes_or_seasons':
+                list_episodes_or_seasons(params['page_id'])
+            elif params['action'] == 'list_episodes':
+                list_episodes(page_id=params['page_id'], season=params['season'])
     else:
         if helper.check_for_prerequisites():
             list_pages()
