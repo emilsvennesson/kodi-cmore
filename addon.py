@@ -67,6 +67,8 @@ def list_page(page=None, namespace=None, root_page=False, page_data=None):
                 list_live_event(i)
         elif 'displayableDate' in i.keys():
             list_event_date(i)
+        elif 'channel' in i.keys():
+            list_channel(i)
         elif 'namespace' in i.keys():  # theme pages
             list_genres(i, page)
         elif 'page_data' in i.keys():  # parsed containers
@@ -82,6 +84,33 @@ def list_genres(i, page):
     }
 
     helper.add_item(i['headline'], params)
+
+def list_channel(i):
+    params = {
+        'action': 'play',
+        'video_id': i['channel']['videoId']
+    }
+
+    program_info = {
+        'mediatype': 'video',
+        'title': i['programs'][0]['title'],
+        'genre': i['programs'][0].get('mainCategory'),
+        'plot': i['programs'][0].get('description')
+    }
+
+    channel_art = {
+        'fanart': helper.c.get_image_url(i['programs'][0].get('landscapeImage')),
+        'thumb': helper.c.get_image_url(i['programs'][0].get('landscapeImage')),
+        'cover': helper.c.get_image_url(i['programs'][0].get('landscapeImage')),
+        'icon': helper.c.get_image_url(i['channel']['logoUrl'])
+    }
+
+    channel_colored = coloring(i['channel']['title'], 'live').encode('utf-8')
+    time_colored = coloring(i['programs'][0]['caption'], 'live').encode('utf-8')
+    program_title = i['programs'][0]['title'].encode('utf-8')
+    list_title = '[B]{0} {1}[/B]: {2}'.format(channel_colored, time_colored, program_title)
+
+    helper.add_item(list_title, params=params, info=program_info, art=channel_art, content='episodes', playable=True)
 
 
 def list_containers(i):
@@ -111,9 +140,7 @@ def list_event_date(date):
 
 def coloring(text, meaning):
     """Return the text wrapped in appropriate color markup."""
-    if meaning == 'channel':
-        color = 'FF0FE8F0'
-    elif meaning == 'live':
+    if meaning == 'live':
         color = 'FF03F12F'
     elif meaning == 'upcoming':
         color = 'FFF16C00'
