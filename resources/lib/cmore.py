@@ -219,18 +219,19 @@ class CMore(object):
         page = self.get_page(page_id, namespace)
         if 'targets' in page.keys():
             return page['targets']  # movie/series items on theme-pages
-        elif 'nowPlaying' in page.keys():
+        if 'nowPlaying' in page.keys():
             return page['nowPlaying']  # tv channels/program info
-        elif 'scheduledEvents' in page.keys():
+        if 'scheduledEvents' in page.keys():
             return page['scheduledEvents']  # sports events
-        elif page.get('containers'):
+        if page.get('containers'):
+            if page['containers'].get('page_link_container'):
+                if page['containers']['page_link_container']['pageLinks'] and root_page:
+                    # no parsing needed as it's already in the 'correct' format
+                    return page['containers']['page_link_container']['pageLinks']
             if 'genre_containers' in page['containers'].keys():
                 return self.parse_containers(page['containers']['genre_containers'])
-            elif 'section_containers' in page['containers'].keys():
+            if 'section_containers' in page['containers'].keys():
                 return self.parse_containers(page['containers']['section_containers'])
-            elif page['containers']['page_link_container']['pageLinks'] and root_page:
-                # no parsing needed as it's already in the 'correct' format
-                return page['containers']['page_link_container']['pageLinks']
         else:
             self.log('Failed to parse page.')
             return False
