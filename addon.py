@@ -180,6 +180,7 @@ def list_live_event(event):
 
     event_info = {
         'mediatype': 'video',
+        'title': event.get('title'),
         'plot': event.get('description'),
         'plotoutline': event.get('caption'),
         'year': int(event['year']) if event.get('year') else None,
@@ -206,7 +207,7 @@ def list_movie(movie):
 
     movie_info = {
         'mediatype': 'movie',
-        'title': movie['title'],
+        'title': movie.get('title'),
         'plot': movie.get('description'),
         'cast': movie.get('actors') if movie.get('actors') else [],
         'genre': extract_genre_year(movie.get('caption'), 'genre'),
@@ -249,7 +250,7 @@ def list_show(show):
 
     show_info = {
         'mediatype': 'tvshow',
-        'title': show['title'],
+        'title': show.get('title'),
         'plot': show.get('description'),
         'cast': show.get('actors') if show.get('actors') else [],
         'genre': extract_genre_year(show.get('caption'), 'genre'),
