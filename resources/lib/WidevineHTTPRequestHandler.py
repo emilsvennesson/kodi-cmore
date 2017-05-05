@@ -13,16 +13,16 @@ class WidevineHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_POST(self):
         length = int(self.headers['content-length'])
-        challenge = self.rfile.read(length)
+        wv_challenge = self.rfile.read(length)
         query = dict(urlparse.parse_qsl(urlparse.urlsplit(self.path).query))
         mpd_url = query['mpd_url']
         token = query['license_url'].split('token=')[1]
 
         try:
-            license = wv.get_license(mpd_url, challenge, token)
+            wv_license = wv.get_license(mpd_url, wv_challenge, token)
             self.send_response(200)
             self.end_headers()
-            self.wfile.write(license)
+            self.wfile.write(wv_license)
             self.finish()
         except Exception as ex:
             self.send_response(400)
