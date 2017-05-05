@@ -232,9 +232,10 @@ class CMore(object):
                 return self.parse_containers(page['containers']['genre_containers'])
             if 'section_containers' in page['containers'].keys():
                 return self.parse_containers(page['containers']['section_containers'])
-        else:
-            self.log('Failed to parse page.')
-            return False
+
+        # if nothing matches
+        self.log('Failed to parse page.')
+        return False
 
     def parse_containers(self, containers):
         parsed_containers = []
