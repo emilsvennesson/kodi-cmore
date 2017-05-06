@@ -301,10 +301,11 @@ def list_episodes(page_id=None, season=None, series_data=None):
             'video_id': i['videoId']
         }
 
-        title = i['title'].replace(': ', '').encode('utf-8')
+        title = i.get('title').replace(': ', '').encode('utf-8')
 
         episode_info = {
             'mediatype': 'episode',
+            'title': title,
             'tvshowtitle': i['seriesTitle'] if i.get('seriesTitle') else title,
             'plot': i.get('description'),
             'year': int(i['year']) if i.get('year') else None,
@@ -315,7 +316,7 @@ def list_episodes(page_id=None, season=None, series_data=None):
             'duration': i.get('duration')
         }
 
-        episode_info['title'] = add_season_episode_to_title(title, episode_info['season'], episode_info['episode'])
+        list_title = add_season_episode_to_title(title, episode_info['season'], episode_info['episode'])
 
         episode_art = {
             'fanart': helper.c.get_image_url(i.get('landscapeImage')),
@@ -325,7 +326,7 @@ def list_episodes(page_id=None, season=None, series_data=None):
             'poster': helper.c.get_image_url(i.get('posterImage'))
         }
 
-        helper.add_item(episode_info['title'], params=params, info=episode_info, art=episode_art, content='episodes', playable=True)
+        helper.add_item(list_title, params=params, info=episode_info, art=episode_art, content='episodes', playable=True)
     helper.eod()
 
 
