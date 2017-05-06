@@ -252,18 +252,6 @@ class CMore(object):
 
         return parsed_containers
 
-
-    def get_unfinished_assets(self, limit=200):
-        url = self.config['links']['personalizationAPI'] + 'unfinished_assets'
-        params = {
-            'limit': limit,
-            'locale': self.locale
-        }
-        headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('jwt_token'))}
-        data = self.make_request(url, 'get', params=params, headers=headers)
-
-        return json.loads(data)['data']
-
     def get_stream(self, video_id):
         stream = {}
         allowed_formats = ['ism', 'mpd']

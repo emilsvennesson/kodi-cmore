@@ -208,20 +208,6 @@ class KodiHelper(object):
             items.append((recursive_url, listitem, folder))
             return items
 
-    def get_image(self, url):
-        cache_dir = os.path.join(self.addon_profile, 'cache')
-        if not os.path.exists(cache_dir):
-            os.makedirs(cache_dir)
-        image_uri = url.split('/')[3].strip()
-        img_location = os.path.join(cache_dir, image_uri)
-        if os.path.exists(img_location):
-            return img_location
-        else:
-            image = self.c.make_request(url, 'get')
-            with open(img_location, 'wb') as img:
-                img.write(image)
-            return img_location
-
     def eod(self):
         """Tell Kodi that the end of the directory listing is reached."""
         xbmcplugin.endOfDirectory(self.handle)
