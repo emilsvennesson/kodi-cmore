@@ -208,7 +208,7 @@ def list_movie(movie):
     movie_info = {
         'mediatype': 'movie',
         'title': movie.get('title'),
-        'plot': movie.get('description'),
+        'plot': movie.get('description') if movie.get('description') else movie.get('caption'),
         'cast': movie.get('actors') if movie.get('actors') else [],
         'genre': extract_genre_year(movie.get('caption'), 'genre'),
         'duration': movie.get('duration'),
@@ -251,7 +251,7 @@ def list_show(show):
     show_info = {
         'mediatype': 'tvshow',
         'title': show.get('title'),
-        'plot': show.get('description'),
+        'plot': show.get('description') if show.get('description') else show.get('caption'),
         'cast': show.get('actors') if show.get('actors') else [],
         'genre': extract_genre_year(show.get('caption'), 'genre'),
         'duration': show.get('duration'),
