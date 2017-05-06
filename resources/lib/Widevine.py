@@ -1,6 +1,5 @@
 import json
-
-import xmltodict
+import xml.etree.ElementTree as ET
 from kodihelper import KodiHelper
 
 helper = KodiHelper()
@@ -10,17 +9,16 @@ class Widevine(object):
     license_url = helper.c.config['settings']['drmProxy']
 
     def get_kid(self, mpd_url):
-        # TODO: parse this with ElementTree instead
+        """Parse the KID from the MPD manifest."""
         mpd_data = helper.c.make_request(mpd_url, 'get')
-        mpd_dict = xmltodict.parse(mpd_data)
-        for adapt_set in mpd_dict['MPD']['Period']['AdaptationSet']:
-            if 'ContentProtection' in adapt_set.keys():
-                for cenc in adapt_set['ContentProtection']:
-                    if '@cenc:default_KID' in cenc.keys():
-                        kid = cenc['@cenc:default_KID']
-                        return kid
+        mpd_root = ET.fromstring(mpd_data)
+
+        for i in mpd_root.iter('{urn:mpeg:dash:schema:mpd:2011}ContentProtection'):
+            if '{urn:mpeg:cenc:2013}default_KID' in i.attrib:
+                return i.attrib['{urn:mpeg:cenc:2013}default_KID']
 
     def get_license(self, mpd_url, wv_challenge, token):
+        """Acquire the Widevine license from the license server and return it."""
         post_data = {
             'drm_info': [x for x in bytearray(wv_challenge)],  # convert challenge to a list of bytes
             'kid': self.get_kid(mpd_url),

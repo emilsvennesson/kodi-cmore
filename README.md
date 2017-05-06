@@ -7,6 +7,5 @@ Feedback and constructive input are of course always welcome.
 
 ## Prerequisites: ##
  * Requests >= 2.9.1 (http://mirrors.kodi.tv/addons/krypton/script.module.requests)
- * xmltodict (http://mirrors.kodi.tv/addons/krypton/script.module.xmltodict)
  * inputstream.adaptive
  * libwidevine
