@@ -30,8 +30,7 @@ class CMore(object):
         self.pages = {
             'sv_SE': ['start', 'movies', 'series', 'sports', 'tv', 'programs', 'kids'],
             'da_DK': ['start', 'movies', 'series', 'sports', 'tv', 'kids'],
-            'nb_NO': ['start', 'movies', 'series', 'tv', 'kids'],
-            'fi_FI': ['start', 'movies', 'series', 'tv', 'kids']
+            'nb_NO': ['start', 'movies', 'series', 'tv', 'kids']
         }
         try:
             self.cookie_jar.load(ignore_discard=True, ignore_expires=True)

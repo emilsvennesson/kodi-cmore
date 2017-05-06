@@ -144,16 +144,14 @@ class KodiHelper(object):
             return False
 
     def set_locale(self, locale=None):
-        countries = ['sv_SE', 'da_DK', 'nb_NO', 'fi_FI']
+        countries = ['sv_SE', 'da_DK', 'nb_NO']
         if not locale:
-            options = [self.language(30013), self.language(30014), self.language(30015), self.language(30016)]
+            options = [self.language(30013), self.language(30014), self.language(30015)]
             selected_locale = self.dialog('select', self.language(30012), options=options)
             if selected_locale is None:
                 selected_locale = 0  # default to .se
             self.set_setting('locale_title', options[selected_locale])
             self.set_setting('locale', countries[selected_locale])
-            if selected_locale == 3:
-                self.set_setting('tv_provider_login', 'false')  # fi_FI doesn't have any tv providers
             self.reset_credentials()  # reset credentials when locale is changed
 
         return True

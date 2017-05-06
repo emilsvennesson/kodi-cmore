@@ -1,7 +1,7 @@
 ﻿<settings>
   <category label="30000">
     <setting id="locale_title" type="action" option="close" action="RunPlugin(plugin://plugin.video.cmore/?setting=set_locale)" label="30012" default="cmore.se"/>
-    <setting id="tv_provider_login" type="bool" label="30008" visible="!eq(-1,cmore.fi)" default="false"/>
+    <setting id="tv_provider_login" type="bool" label="30008" default="false"/>
     <setting id="username" type="text" label="30006" visible="eq(-1,false)" enable="!eq(-1,)" default=""/>
     <setting id="password" type="text" label="30007" visible="eq(-2,false)" option="hidden" enable="!eq(-1,)" default=""/>
     <setting id="operator_title" type="text" label="30011" visible="eq(-3,true) + !eq(0,)" enable="false" subsetting="true" default=""/>
