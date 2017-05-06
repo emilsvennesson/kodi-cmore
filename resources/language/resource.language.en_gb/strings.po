@@ -136,3 +136,7 @@ msgstr ""
 msgctxt "#30030"
 msgid "Search"
 msgstr ""
+
+msgctxt "#30031"
+msgid "No results found for"
+msgstr ""

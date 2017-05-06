@@ -51,19 +51,22 @@ def list_pages():
     helper.eod()
 
 
-def list_page(page=None, namespace=None, root_page=False, page_data=None, search=False):
-    if page_data:
-        if not isinstance(page_data, list):  # we supply the data as a list for search queries
-            page = json.loads(page_data)
-        else:
-            page = page_data
-    else:
-        page = helper.c.parse_page(page, namespace, helper.get_as_bool(root_page))
+def list_page(page=None, namespace=None, root_page=False, page_data=None, search_query=None):
+    if page and not page_data:
+        page_data = helper.c.parse_page(page, namespace, helper.get_as_bool(root_page))
+    elif search_query:
+        page_data = helper.c.get_search_data(search_query)
 
-    for i in page:
+    if not page_data:
+        if search_query:
+            helper.dialog('ok', helper.language(30017), '{0} \'{1}\'.'.format(helper.language(30031), search_query))
+        helper.log('No page data found.')
+        return False
+
+    for i in page_data:
         page = i.get('id')
         # search queries doesn't include the videoId in response
-        if i.get('videoId') or search:
+        if i.get('videoId') or search_query:
             if i.get('type') == 'movie':
                 list_movie(i)
             elif i.get('type') == 'series':
@@ -347,9 +350,9 @@ def add_season_episode_to_title(title, season, episode):
         return title
 
 def search():
-    query = helper.get_user_input(helper.language(30030))
-    if query:
-        list_page(page_data=helper.c.get_search_data(query), search=True)
+    search_query = helper.get_user_input(helper.language(30030))
+    if search_query:
+        list_page(search_query=search_query)
     else:
         helper.log('No search query provided.')
         return False
