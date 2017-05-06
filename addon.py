@@ -52,18 +52,20 @@ def list_pages():
 
 
 def list_page(page=None, namespace=None, root_page=False, page_data=None, search_query=None):
-    if page and not page_data:
-        page_data = helper.c.parse_page(page, namespace, helper.get_as_bool(root_page))
+    if page:
+        page_dict = helper.c.parse_page(page, namespace, helper.get_as_bool(root_page))
+    elif page_data:
+        page_dict = json.loads(page_data)
     elif search_query:
-        page_data = helper.c.get_search_data(search_query)
+        page_dict = helper.c.get_search_data(search_query)
 
-    if not page_data:
+    if not page_dict:
         if search_query:
             helper.dialog('ok', helper.language(30017), '{0} \'{1}\'.'.format(helper.language(30031), search_query))
         helper.log('No page data found.')
         return False
 
-    for i in page_data:
+    for i in page_dict:
         page = i.get('id')
         # search queries doesn't include the videoId in response
         if i.get('videoId') or search_query:
