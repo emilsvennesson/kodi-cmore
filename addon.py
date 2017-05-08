@@ -214,7 +214,7 @@ def list_movie(movie):
         'mediatype': 'movie',
         'title': movie.get('title'),
         'plot': movie.get('description') if movie.get('description') else movie.get('caption'),
-        'cast': movie.get('actors') if movie.get('actors') else [],
+        'cast': movie.get('actors', []),
         'genre': extract_genre_year(movie.get('caption'), 'genre'),
         'duration': movie.get('duration'),
         'year': int(extract_genre_year(movie.get('caption'), 'year'))
@@ -257,7 +257,7 @@ def list_show(show):
         'mediatype': 'tvshow',
         'title': show.get('title'),
         'plot': show.get('description') if show.get('description') else show.get('caption'),
-        'cast': show.get('actors') if show.get('actors') else [],
+        'cast': show.get('actors', []),
         'genre': extract_genre_year(show.get('caption'), 'genre'),
         'duration': show.get('duration'),
         'year': extract_genre_year(show.get('caption'), 'year')
@@ -317,7 +317,7 @@ def list_episodes(page_id=None, season=None, series_data=None):
             'season': int(i['season']) if i.get('season') else None,
             'episode': int(i['episode']) if i.get('episode') else None,
             'genre': ', '.join(i['subCategories']) if i.get('subCategories') else None,
-            'cast': i.get('actors') if i.get('actors') else [],
+            'cast': i.get('actors', []),
             'duration': i.get('duration')
         }
 
