@@ -159,10 +159,8 @@ class KodiHelper(object):
     def get_operator(self, operator=None):
         if not operator:
             self.set_setting('tv_provider_login', 'true')
-            options = []
             operators = self.c.get_operators()
-            for i in operators:
-                options.append(i['title'])
+            options = [x['title'] for x in operators]
 
             selected_operator = self.dialog('select', self.language(30010), options=options)
             if selected_operator is not None:
