@@ -113,7 +113,7 @@ class CMore(object):
         config_version = int(str(config['settings']['currentAppVersion']).replace('.', ''))
         version_to_use = int(str(self.config_version).replace('.', ''))
         config_lang = config['bootstrap']['suggested_site']['locale']
-        if config_version != version_to_use or config_lang != self.locale:
+        if version_to_use > config_version or config_lang != self.locale:
             self.download_config()
             config = json.load(open(self.config_path))['data']
 
