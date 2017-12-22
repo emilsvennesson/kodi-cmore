@@ -300,10 +300,7 @@ class CMore(object):
 
     def parse_datetime(self, event_date):
         """Parse date string to datetime object."""
-        if '+01:00' in event_date:
-            date_time_format = '%Y-%m-%dT%H:%M:%S+01:00'  # winter time
-        else:
-            date_time_format = '%Y-%m-%dT%H:%M:%S+02:00'
+        date_time_format = '%Y-%m-%dT%H:%M:%S+' + event_date.split('+')[1]  # summer/winter time changes format
         datetime_obj = datetime(*(time.strptime(event_date, date_time_format)[0:6]))
         return datetime_obj
 
