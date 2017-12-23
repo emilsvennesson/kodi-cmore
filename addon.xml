@@ -5,7 +5,7 @@
        provider-name="emilsvennesson">
   <requires>
     <import addon="xbmc.python" version="2.25.0"/>
-    <import addon="inputstream.adaptive" version="1.0.8"/>
+    <import addon="script.module.inputstreamhelper" version="0.2.2"/>
     <import addon="script.module.requests" version="2.9.1"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">

@@ -8,6 +8,7 @@ import xbmc
 import xbmcvfs
 import xbmcgui
 import xbmcplugin
+import inputstreamhelper
 from xbmcaddon import Addon
 
 
@@ -213,16 +214,21 @@ class KodiHelper(object):
     def play_item(self, video_id):
         wv_proxy_base = 'http://localhost:' + str(self.get_setting('wv_proxy_port'))
         stream = self.c.get_stream(video_id)
-
-        playitem = xbmcgui.ListItem(path=stream['mpd_url'])
-        playitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
-        playitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-
         if stream['drm_protected']:
-            playitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-            wv_proxy_url = '{0}?mpd_url={1}&license_url={2}'.format(wv_proxy_base, stream['mpd_url'], stream['license_url'])
-            playitem.setProperty('inputstream.adaptive.license_key', wv_proxy_url + '||R{SSM}|')
-        xbmcplugin.setResolvedUrl(self.handle, True, listitem=playitem)
+            drm = 'widevine'
+        else:
+            drm = None
+
+        ia_helper = inputstreamhelper.Helper('mpd', drm=drm)
+        if ia_helper.check_inputstream():
+            playitem = xbmcgui.ListItem(path=stream['mpd_url'])
+            playitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+            playitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+            if drm:
+                playitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
+                wv_proxy_url = '{0}?mpd_url={1}&license_url={2}'.format(wv_proxy_base, stream['mpd_url'], stream['license_url'])
+                playitem.setProperty('inputstream.adaptive.license_key', wv_proxy_url + '||R{SSM}|')
+            xbmcplugin.setResolvedUrl(self.handle, True, listitem=playitem)
 
     def get_as_bool(self, string):
         if string == 'true':
