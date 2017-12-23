@@ -1,3 +1,8 @@
+# Author: asciidisco
+# Module: service
+# Created on: 13.01.2017
+# License: MIT https://goo.gl/5bMj3H
+
 import threading
 import SocketServer
 import socket
