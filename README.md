@@ -1,11 +1,19 @@
-﻿# C More Kodi add-on #
-Before reading further, please note that this add-on is unoffical and is not endorsed or supported by C More Entertainment in any way. Not all features are supported or thoroughly tested and may not work as intended.
+﻿# C More for Kodi #
+This is a Kodi add-on that allows you to stream content from C More in Kodi.
 
-If you're interested in helping out with the development, then please just send me a pull request. If you're reporting a bug, please activate debug logging in Kodi and attach the log file.
+## Disclaimer ##
+This add-on is unoffical and is not endorsed or supported by C More Entertainment in any way. Not all features may work or has been thoroughly tested.
 
-Feedback and constructive input are of course always welcome.
+## Dependencies: ##
+ * script.module.requests >= 2.9.1 (http://mirrors.kodi.tv/addons/krypton/script.module.requests/)
+ * script.module.inputstreamhelper (http://mirrors.kodi.tv/addons/krypton/script.module.inputstreamhelper/)
+ 
+Kodi 17.4 or higher with InputStream Adaptive installed is required for this add-on. Subtitles require Kodi 18 in order to work.
 
-## Prerequisites: ##
- * Requests >= 2.9.1 (http://mirrors.kodi.tv/addons/krypton/script.module.requests)
- * inputstream.adaptive
- * libwidevine
+## DRM protected streams ##
+A lot of the content is DRM protected and requires the proprietary decryption module Widevine CDM for playback. You will be prompted to install this if you're attempting to play a DRM protected stream without the binary installed.
+
+It is encouraged to actually read the Widevine EULA that will be displayed so that you understand what you can and cannot do with the binary.
+
+## License ##
+This add-on is licensed under the **The MIT License**. Please see the [LICENSE.txt](LICENSE.txt) file for details.
