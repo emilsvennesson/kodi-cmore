@@ -6,7 +6,7 @@ This add-on is unoffical and is not endorsed or supported by C More Entertainmen
 
 ## Dependencies: ##
  * script.module.requests >= 2.9.1 (http://mirrors.kodi.tv/addons/krypton/script.module.requests/)
- * script.module.inputstreamhelper (http://mirrors.kodi.tv/addons/krypton/script.module.inputstreamhelper/)
+ * script.module.inputstreamhelper >= 0.2.2 (http://mirrors.kodi.tv/addons/krypton/script.module.inputstreamhelper/)
  
 Kodi 17.4 or higher with InputStream Adaptive installed is required for this add-on. Subtitles require Kodi 18 in order to work.
 
