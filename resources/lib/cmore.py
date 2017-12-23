@@ -54,45 +54,39 @@ class CMore(object):
         """Make an HTTP request. Return the response."""
         self.log('Request URL: %s' % url)
         self.log('Method: %s' % method)
-        self.log('Params: %s' % params)
-        self.log('Payload: %s' % payload)
-        self.log('Headers: %s' % headers)
+        if params:
+            self.log('Params: %s' % params)
+        if payload:
+            self.log('Payload: %s' % payload)
+        if headers:
+            self.log('Headers: %s' % headers)
+
+        if method == 'get':
+            req = self.http_session.get(url, params=params, headers=headers)
+        elif method == 'put':
+            req = self.http_session.put(url, params=params, data=payload, headers=headers)
+        else:  # post
+            req = self.http_session.post(url, params=params, data=payload, headers=headers)
+        self.log('Response code: %s' % req.status_code)
+        self.log('Response: %s' % req.content)
+
+        return self.parse_response(req.content)
+
+    def parse_response(self, response):
         try:
-            if method == 'get':
-                req = self.http_session.get(url, params=params, headers=headers)
-            elif method == 'put':
-                req = self.http_session.put(url, params=params, data=payload, headers=headers)
-            else:  # post
-                req = self.http_session.post(url, params=params, data=payload, headers=headers)
-            self.log('Response code: %s' % req.status_code)
-            self.log('Response: %s' % req.content)
-            self.raise_cmore_error(req.content)
-            return req.content
+            response = json.loads(response)
+            if 'error' in response:
+                if 'message' in response['error']:
+                    raise self.CMoreError(response['error']['message'])
+                elif 'description' in response['error']:
+                    raise self.CMoreError(response['error']['description'])
+                elif 'code' in response['error']:
+                    raise self.CMoreError(response['error']['error'])
 
-        except requests.exceptions.ConnectionError as error:
-            self.log('Connection Error: - %s' % error.message)
-            raise
-        except requests.exceptions.RequestException as error:
-            self.log('Error: - %s' % error.value)
-            raise
-
-    def raise_cmore_error(self, response):
-        try:
-            error = json.loads(response)['error']
-            if isinstance(error, dict):
-                if 'message' in error.keys():
-                    raise self.CMoreError(error['message'])
-                elif 'code' in error.keys():
-                    raise self.CMoreError(error['code'])
-            elif isinstance(error, str):
-                raise self.CMoreError(error)
-
-            raise self.CMoreError('Error')  # generic error message
-
-        except KeyError:
-            pass
         except ValueError:  # when response is not in json
             pass
+
+        return response
 
     def get_config(self):
         """Return the config in a dict. Re-download if the config version doesn't match self.config_version."""
@@ -120,7 +114,7 @@ class CMore(object):
         }
         config_data = self.make_request(url, 'get', params=params)
         with open(self.config_path, 'w') as fh_config:
-            fh_config.write(config_data)
+            fh_config.write(json.dumps(config_data))
 
     def save_credentials(self, credentials):
         credentials_dict = json.loads(credentials)['data']
@@ -153,7 +147,7 @@ class CMore(object):
         }
         data = self.make_request(url, 'get', params=params)
 
-        return json.loads(data)['data']['operators']
+        return data['data']['operators']
 
     def login(self, username=None, password=None, operator=None):
         url = self.config['links']['accountAPI'] + 'session'
@@ -180,7 +174,7 @@ class CMore(object):
 
 
         credentials = self.make_request(url, method, params=params, payload=payload)
-        self.save_credentials(credentials)
+        self.save_credentials(json.dumps(credentials))
 
     def get_page(self, page_id, namespace='page'):
         url = self.config['links']['pageAPI'] + page_id
@@ -191,7 +185,7 @@ class CMore(object):
         headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('jwt_token'))}
         data = self.make_request(url, 'get', params=params, headers=headers)
 
-        return json.loads(data)['data']
+        return data['data']
 
     def get_contentdetails(self, page_type, page_id, season=None, size='999', page='1'):
         url = self.config['links']['contentDetailsAPI'] + '{0}/{1}'.format(page_type, page_id)
@@ -204,7 +198,7 @@ class CMore(object):
         headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('jwt_token'))}
         data = self.make_request(url, 'get', params=params, headers=headers)
 
-        return json.loads(data)['data']
+        return data['data']
 
     def parse_page(self, page_id, namespace='page', root_page=False):
         page = self.get_page(page_id, namespace)
@@ -250,7 +244,7 @@ class CMore(object):
         url = self.config['links']['vimondRestAPI'] + 'api/tve_web/asset/{0}/play.json'.format(video_id)
         params = {'protocol': 'VUDASH'}
         headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('vimond_token'))}
-        data_dict = json.loads(self.make_request(url, 'get', params=params, headers=headers))['playback']
+        data_dict = self.make_request(url, 'get', params=params, headers=headers)['playback']
         stream['drm_protected'] = data_dict['drmProtected']
 
         if isinstance(data_dict['items']['item'], list):
@@ -288,7 +282,7 @@ class CMore(object):
         headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('jwt_token'))}
         data = self.make_request(url, 'get', params=params, headers=headers)
 
-        return json.loads(data)['data']['hits']
+        return data['data']['hits']
 
     def parse_datetime(self, event_date):
         """Parse date string to datetime object."""
