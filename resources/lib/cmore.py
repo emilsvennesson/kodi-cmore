@@ -5,7 +5,6 @@ A Kodi-agnostic library for C More
 import os
 import json
 import codecs
-import cookielib
 import time
 from datetime import datetime
 
@@ -19,7 +18,6 @@ class CMore(object):
         self.locale_suffix = self.locale.split('_')[1].lower()
         self.http_session = requests.Session()
         self.settings_folder = settings_folder
-        self.cookie_jar = cookielib.LWPCookieJar(os.path.join(self.settings_folder, 'cookie_file'))
         self.credentials_file = os.path.join(settings_folder, 'credentials')
         self.base_url = 'https://cmore-mobile-bff.b17g.services'
         self.config_path = os.path.join(self.settings_folder, 'configuration.json')
@@ -32,11 +30,6 @@ class CMore(object):
             'da_DK': ['start', 'movies', 'series', 'sports', 'tv', 'kids'],
             'nb_NO': ['start', 'movies', 'series', 'tv', 'kids']
         }
-        try:
-            self.cookie_jar.load(ignore_discard=True, ignore_expires=True)
-        except IOError:
-            pass
-        self.http_session.cookies = self.cookie_jar
 
     class CMoreError(Exception):
         def __init__(self, value):
@@ -73,7 +66,6 @@ class CMore(object):
                 req = self.http_session.post(url, params=params, data=payload, headers=headers)
             self.log('Response code: %s' % req.status_code)
             self.log('Response: %s' % req.content)
-            self.cookie_jar.save(ignore_discard=True, ignore_expires=False)
             self.raise_cmore_error(req.content)
             return req.content
 
