@@ -13,7 +13,7 @@ def run():
     try:
         router(sys.argv[2][1:])  # trim the leading '?' from the plugin call paramstring
     except helper.c.CMoreError as error:
-        if error.value == 'SESSION_NOT_AUTHENTICATED':
+        if error.value == 'SESSION_NOT_AUTHENTICATED' or error.value == 'User is not authenticated':
             helper.login_process()
             router(sys.argv[2][1:])
         else:
