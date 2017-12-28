@@ -75,13 +75,13 @@ def list_page(page=None, namespace=None, root_page=False, page_data=None, search
                 list_show(i)
             elif i.get('type') == 'live_event':
                 list_live_event(i)
-        elif 'displayableDate' in i.keys():
+        elif 'displayableDate' in i:
             list_event_date(i)
-        elif 'channel' in i.keys():
+        elif 'channel' in i:
             list_channel(i)
-        elif 'namespace' in i.keys():  # theme pages
+        elif 'namespace' in i:  # theme pages
             list_genres(i, page)
-        elif 'page_data' in i.keys():  # parsed containers
+        elif 'page_data' in i:  # parsed containers
             list_containers(i)
     helper.eod()
 
