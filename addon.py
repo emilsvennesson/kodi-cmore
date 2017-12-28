@@ -20,8 +20,8 @@ def run():
             helper.dialog('ok', helper.language(30028), error.value)
 
 
-def list_pages():
-    for page in helper.c.pages[helper.c.locale]:
+def list_root_pages():
+    for page in helper.c.root_pages[helper.c.locale]:
         if page == 'start':
             title = helper.language(30020)
         elif page == 'movies':
@@ -388,4 +388,4 @@ def router(paramstring):
                 search()
     else:
         if helper.check_for_prerequisites():
-            list_pages()
+            list_root_pages()

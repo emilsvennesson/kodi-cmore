@@ -25,7 +25,7 @@ class CMore(object):
         self.config = self.get_config()
         self.client = 'cmore-android'
         # hopefully, this can be acquired dynamically in the future
-        self.pages = {
+        self.root_pages = {
             'sv_SE': ['start', 'movies', 'series', 'sports', 'tv', 'programs', 'kids'],
             'da_DK': ['start', 'movies', 'series', 'sports', 'tv', 'kids'],
             'nb_NO': ['start', 'movies', 'series', 'tv', 'kids']
