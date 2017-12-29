@@ -20,8 +20,8 @@
     <language>en</language>
     <disclaimer>This add-on is completely unofficial and is not endorsed by C More Entertainment in any way.</disclaimer>
     <assets>
-      <icon>resources/art/icon.png</icon>
-      <fanart>resources/art/fanart.jpg</fanart>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
     </assets>
   </extension>
 </addon>
