@@ -154,6 +154,8 @@ def coloring(text, meaning):
     """Return the text wrapped in appropriate color markup."""
     if meaning == 'live':
         color = 'FF03F12F'
+    elif meaning == 'archive':
+        color = 'FFFF0EE0'
     elif meaning == 'upcoming':
         color = 'FFF16C00'
 
@@ -176,7 +178,10 @@ def list_live_event(event):
         params = {'action': 'noop'}
         playable = False
     else:
-        event_status = 'live'
+        if 'liveEventEnd' in event:  # if sports content is on-demand
+            event_status = 'archive'
+        else:
+            event_status = 'live'
         params = {
             'action': 'play',
             'video_id': event['videoId']
