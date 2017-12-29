@@ -6,7 +6,7 @@ import os
 import json
 import codecs
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 
@@ -261,7 +261,30 @@ class CMore(object):
                 stream['license_url'] = data_dict['items']['item']['license']['@uri']
                 stream['drm_type'] = data_dict['items']['item']['license']['@name']
 
+        live_stream_offset = self.parse_stream_offset(video_id)
+        if live_stream_offset:
+            stream['mpd_url'] = '{0}?t={1}'.format(stream['mpd_url'], live_stream_offset)
+
         return stream
+
+    def parse_stream_offset(self, video_id):
+        """Calculate offset parameter needed for on-demand sports content."""
+        url = self.config['links']['vimondRestAPI'] + 'api/tve_web/asset/{0}.json'.format(video_id)
+        params = {'expand': 'metadata'}
+        headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('jwt_token'))}
+        data = self.make_request(url, 'get', params=params, headers=headers)['asset']
+
+        if 'live-event-end' in data['metadata']:
+            utc_time_difference = int(data['liveBroadcastTime'].split('+')[1][1])
+            start_time_local = self.parse_datetime(data['liveBroadcastTime'])
+            end_time_local = self.parse_datetime(data['metadata']['live-event-end']['$'])
+
+            start_time_utc = start_time_local - timedelta(hours=utc_time_difference)
+            end_time_utc = end_time_local - timedelta(hours=utc_time_difference)
+            offset = '{0}-{1}'.format(start_time_utc.isoformat(), end_time_utc.isoformat())
+            return offset
+        else:
+            return None
 
     def get_image_url(self, image_url):
         """Request the image from their image proxy. Can be extended to resize/add image effects automatically.
