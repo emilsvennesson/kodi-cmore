@@ -165,6 +165,7 @@ class KodiHelper(object):
 
             selected_operator = self.dialog('select', self.language(30010), options=options)
             if selected_operator is not None:
+                self.reset_credentials()  # make sure we get fresh username/password info
                 operator = operators[selected_operator]['name']
                 operator_title = operators[selected_operator]['title']
                 self.set_setting('operator', operator)
