@@ -39,14 +39,15 @@ class CMore(object):
             return repr(self.value)
 
     def log(self, string):
+        """C More class log method."""
         if self.debug:
             try:
-                print '[C More]: %s' % string
+                print('[C More]: %s') % string
             except UnicodeEncodeError:
                 # we can't anticipate everything in unicode they might throw at
                 # us, but we can handle a simple BOM
                 bom = unicode(codecs.BOM_UTF8, 'utf8')
-                print '[C More]: %s' % string.replace(bom, '')
+                print('[C More]: %s' % string.replace(bom, ''))
             except:
                 pass
 
@@ -73,6 +74,7 @@ class CMore(object):
         return self.parse_response(req.content)
 
     def parse_response(self, response):
+        """Try to load JSON data into dict and raise potential API errors."""
         try:
             response = json.loads(response)
             if 'error' in response:
@@ -117,6 +119,7 @@ class CMore(object):
             fh_config.write(json.dumps(config_data))
 
     def save_credentials(self, credentials):
+        """Save credentials in JSON format."""
         credentials_dict = json.loads(credentials)['data']
         if self.get_credentials().get('remember_me'):
             credentials_dict['remember_me'] = {}
@@ -125,11 +128,13 @@ class CMore(object):
             fh_credentials.write(json.dumps(credentials_dict))
 
     def reset_credentials(self):
+        """Overwrite credentials with empty JSON data."""
         credentials = {}
         with open(self.credentials_file, 'w') as fh_credentials:
             fh_credentials.write(json.dumps(credentials))
 
     def get_credentials(self):
+        """Get JSON credentials file from disk and load it into a dictionary."""
         try:
             with open(self.credentials_file, 'r') as fh_credentials:
                 credentials_dict = json.loads(fh_credentials.read())
@@ -140,6 +145,7 @@ class CMore(object):
                 return json.loads(fh_credentials.read())
 
     def get_operators(self):
+        """Return a list of TV operators supported by the C More login system."""
         url = self.config['links']['accountAPI'] + 'operators'
         params = {
             'client': self.client,
@@ -150,13 +156,14 @@ class CMore(object):
         return data['data']['operators']
 
     def login(self, username=None, password=None, operator=None):
+        """Complete login process for C More."""
         url = self.config['links']['accountAPI'] + 'session'
         params = {
             'client': self.client,
             'legacy': 'true'
         }
 
-        if self.get_credentials().get('remember_me'):  # TODO: find out when token expires
+        if self.get_credentials().get('remember_me'):
             method = 'put'
             payload = {
                 'locale': self.locale,
@@ -172,7 +179,6 @@ class CMore(object):
                 payload['country_code'] = self.locale_suffix
                 payload['operator'] = operator
 
-
         credentials = self.make_request(url, method, params=params, payload=payload)
         self.save_credentials(json.dumps(credentials))
 
@@ -187,7 +193,7 @@ class CMore(object):
 
         return data['data']
 
-    def get_contentdetails(self, page_type, page_id, season=None, size='999', page='1'):
+    def get_content_details(self, page_type, page_id, season=None, size='999', page='1'):
         url = self.config['links']['contentDetailsAPI'] + '{0}/{1}'.format(page_type, page_id)
         params = {'locale': self.locale}
         if season:
@@ -223,6 +229,7 @@ class CMore(object):
         return False
 
     def parse_containers(self, containers):
+        """Parse containers in a sane format. See addon.py for implementation examples."""
         parsed_containers = []
         for i in containers:
             if i['pageLink']['id']:
@@ -239,6 +246,7 @@ class CMore(object):
         return parsed_containers
 
     def get_stream(self, video_id):
+        """Return a dict with stream URL and Widevine license URL."""
         stream = {}
         allowed_formats = ['ism', 'mpd']
         url = self.config['links']['vimondRestAPI'] + 'api/tve_web/asset/{0}/play.json'.format(video_id)
@@ -307,12 +315,14 @@ class CMore(object):
 
         return data['data']['hits']
 
+    @staticmethod
     def parse_datetime(self, event_date):
         """Parse date string to datetime object."""
         date_time_format = '%Y-%m-%dT%H:%M:%S+' + event_date.split('+')[1]  # summer/winter time changes format
         datetime_obj = datetime(*(time.strptime(event_date, date_time_format)[0:6]))
         return datetime_obj
 
+    @staticmethod
     def get_current_time(self):
         """Return the current local time."""
         return datetime.now()

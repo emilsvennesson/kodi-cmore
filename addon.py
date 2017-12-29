@@ -85,6 +85,7 @@ def list_page(page=None, namespace=None, root_page=False, page_data=None, search
             list_containers(i)
     helper.eod()
 
+
 def list_genres(i, page):
     params = {
         'action': 'list_page',
@@ -94,6 +95,7 @@ def list_genres(i, page):
     }
 
     helper.add_item(i['headline'], params)
+
 
 def list_channel(i):
     params = {
@@ -275,7 +277,7 @@ def list_show(show):
 
 
 def list_episodes_or_seasons(page_id):
-    series = helper.c.get_contentdetails('series', page_id)
+    series = helper.c.get_content_details('series', page_id)
     if len(series['availableSeasons']) > 1:
         list_seasons(series)
     else:
@@ -296,7 +298,7 @@ def list_seasons(series):
 
 def list_episodes(page_id=None, season=None, series_data=None):
     if page_id:
-        series = helper.c.get_contentdetails('series', page_id, season)
+        series = helper.c.get_content_details('series', page_id, season)
     else:
         series = series_data
 
@@ -350,6 +352,7 @@ def add_season_episode_to_title(title, season, episode):
     else:
         helper.log('No season/episode information found.')
         return title
+
 
 def search():
     search_query = helper.get_user_input(helper.language(30030))
