@@ -140,3 +140,7 @@ msgstr ""
 msgctxt "#30031"
 msgid "No results found for"
 msgstr ""
+
+msgctxt "#30032"
+msgid "[B]Run the add-on to complete the setup process.[/B]"
+msgstr ""
