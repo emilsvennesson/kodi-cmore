@@ -307,7 +307,7 @@ def list_episodes(page_id=None, season=None, series_data=None):
     else:
         series = series_data
 
-    for i in series['capiAssets']:
+    for i in sorted(series['capiAssets'], key=lambda x: x['episode']):
         params = {
             'action': 'play',
             'video_id': i['videoId']
