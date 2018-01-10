@@ -69,11 +69,11 @@ def list_page(page=None, namespace=None, root_page=False, page_data=None, search
         page = i.get('id')
         # search queries doesn't include the videoId in response
         if i.get('videoId') or search_query:
-            if i.get('type') == 'movie':
+            if i['type'] == 'movie':
                 list_movie(i)
-            elif i.get('type') == 'series':
+            elif i['type'] == 'series':
                 list_show(i)
-            elif i.get('type') == 'live_event':
+            elif i['type'] == 'live_event':
                 list_live_event(i)
         elif 'displayableDate' in i:
             list_event_date(i)
@@ -166,8 +166,8 @@ def coloring(text, meaning):
 
 def list_live_event(event):
     if event.get('commentators'):
-        if ',' in event.get('commentators'):
-            commentators = event.get('commentators').split(',')
+        if ',' in event['commentators']:
+            commentators = event['commentators'].split(',')
         else:
             commentators = [event['commentators']]
     else:
@@ -220,7 +220,7 @@ def list_movie(movie):
     movie_info = {
         'mediatype': 'movie',
         'title': movie.get('title'),
-        'plot': movie.get('description') if movie.get('description') else movie.get('caption'),
+        'plot': movie['description'] if movie.get('description') else movie.get('caption'),
         'cast': movie.get('actors', []),
         'genre': extract_genre_year(movie.get('caption'), 'genre'),
         'duration': movie.get('duration'),
@@ -263,7 +263,7 @@ def list_show(show):
     show_info = {
         'mediatype': 'tvshow',
         'title': show.get('title'),
-        'plot': show.get('description') if show.get('description') else show.get('caption'),
+        'plot': show['description'] if show.get('description') else show.get('caption'),
         'cast': show.get('actors', []),
         'genre': extract_genre_year(show.get('caption'), 'genre'),
         'duration': show.get('duration'),
