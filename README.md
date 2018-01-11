@@ -2,11 +2,11 @@
 This is a Kodi add-on that allows you to stream content from C More in Kodi.
 
 ## Disclaimer ##
-This add-on is unoffical and is not endorsed or supported by C More Entertainment in any way. Not all features may work or has been thoroughly tested.
+This add-on is unoffical and is not endorsed or supported by C More Entertainment in any way. Any trademarks used belong to their owning companies and organisations.
 
 ## Dependencies: ##
  * script.module.requests >= 2.9.1 (http://mirrors.kodi.tv/addons/krypton/script.module.requests/)
- * script.module.inputstreamhelper >= 0.2.2 (http://mirrors.kodi.tv/addons/krypton/script.module.inputstreamhelper/)
+ * script.module.inputstreamhelper >= 0.2.4 (http://mirrors.kodi.tv/addons/krypton/script.module.inputstreamhelper/)
  
 This add-on requires Kodi 17.4 or higher with InputStream Adaptive installed. Kodi 18 is required for Android based devices and for subtitles support.
 
