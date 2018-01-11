@@ -14,7 +14,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgctxt "#30000"
-msgid "Account"
+msgid "General"
 msgstr ""
 
 msgctxt "#30001"
@@ -143,4 +143,12 @@ msgstr ""
 
 msgctxt "#30032"
 msgid "[B]Run the add-on to complete the setup process.[/B]"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Credentials"
+msgstr ""
+
+msgctxt "#30034"
+msgid "InputStream Adaptive settings"
 msgstr ""
