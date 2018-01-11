@@ -44,10 +44,10 @@ class KodiHelper(object):
     def set_setting(self, key, value):
         return self.get_addon().setSetting(key, value)
 
-    def is_settings(self):
+    def ia_settings(self):
         """Open InputStream Adaptive settings."""
-        is_addon = Addon('inputstream.adaptive')
-        is_addon.openSettings()
+        ia_addon = Addon('inputstream.adaptive')
+        ia_addon.openSettings()
 
     def log(self, string):
         msg = '%s: %s' % (self.logging_prefix, string)

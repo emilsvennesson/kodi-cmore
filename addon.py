@@ -378,8 +378,8 @@ def router(paramstring):
             helper.set_locale()
         elif params['setting'] == 'reset_credentials':
             helper.reset_credentials()
-        elif params['setting'] == 'is_settings':
-            helper.is_settings()
+        elif params['setting'] == 'ia_settings':
+            helper.ia_settings()
     elif 'action' in params:
         if helper.check_for_prerequisites():
             if params['action'] == 'noop':
