@@ -21,21 +21,19 @@ def run():
 
 
 def list_root_pages():
+    page_names = {
+        'start': helper.language(30020),
+        'movies': helper.language(30021),
+        'series': helper.language(30022),
+        'sports': helper.language(30023),
+        'tv': helper.language(30024),
+        'programs': helper.language(30025),
+        'kids': helper.language(30026)
+    }
+
     for page in helper.c.root_pages[helper.c.locale]:
-        if page == 'start':
-            title = helper.language(30020)
-        elif page == 'movies':
-            title = helper.language(30021)
-        elif page == 'series':
-            title = helper.language(30022)
-        elif page == 'sports':
-            title = helper.language(30023)
-        elif page == 'tv':
-            title = helper.language(30024)
-        elif page == 'programs':
-            title = helper.language(30025)
-        elif page == 'kids':
-            title = helper.language(30026)
+        if page in page_names:
+            title = page_names[page]
         else:
             title = page
 
