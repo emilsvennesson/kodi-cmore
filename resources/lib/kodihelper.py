@@ -51,7 +51,7 @@ class KodiHelper(object):
 
     def log(self, string):
         msg = '%s: %s' % (self.logging_prefix, string)
-        xbmc.log(msg=msg, level=xbmc.LOGDEBUG)
+        xbmc.log(msg=msg.encode('utf-8'), level=xbmc.LOGDEBUG)
 
     def dialog(self, dialog_type, heading, message=None, options=None, nolabel=None, yeslabel=None):
         dialog = xbmcgui.Dialog()
