@@ -226,29 +226,29 @@ class CMore(object):
         self.log('Failed to parse page.')
         return False
 
-    def parse_containers(self, containers):
+    def parse_containers(self, containers_data):
         """Parse containers in a sane format. See addon.py for implementation examples."""
-        items = []
-        if 'showcase' in containers:
-            items = items + containers['showcase']['items']
-        if 'genre_containers' in containers:
-            items = items + containers['genre_containers']
-        if 'section_containers' in containers:
-            items = items + containers['section_containers']
+        containers = []
+        if 'showcase' in containers_data:
+            containers = containers + containers_data['showcase']['items']
+        if 'genre_containers' in containers_data:
+            containers = containers + containers_data['genre_containers']
+        if 'section_containers' in containers_data:
+            containers = containers + containers_data['section_containers']
 
-        parsed_items = []
-        for item in items:
+        parsed_containers = []
+        for item in containers:
             if 'pageLink' in item and item['pageLink']['id']:
-                parsed_items.append(item['pageLink'])
+                parsed_containers.append(item['pageLink'])
             else:
                 container = {
                     'id': item['id'],
                     'attributes': item['attributes'],
                     'page_data': item['targets']
                 }
-                parsed_items.append(container)
+                parsed_containers.append(container)
 
-        return parsed_items
+        return parsed_containers
 
     def get_stream(self, video_id):
         """Return a dict with stream URL and Widevine license URL."""
