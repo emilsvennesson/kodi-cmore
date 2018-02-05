@@ -247,7 +247,7 @@ def list_movie(movie, title=None):
 def extract_genre_year(caption, what_to_extract):
     """Try to extract the genre or year from the caption."""
     if what_to_extract == 'year':
-        list_index = 1
+        list_index = -1
     else:
         list_index = 0
 
