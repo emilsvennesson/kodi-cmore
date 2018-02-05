@@ -64,27 +64,30 @@ def list_page(page=None, namespace=None, root_page=False, page_data=None, search
         return False
 
     for i in page_dict:
-        page = i.get('id')
-        # search queries doesn't include the videoId in response
+        page = i.get('id')  # search queries doesn't include the videoId in response
         if i.get('videoId') or search_query:
-            if i['type'] == 'movie':
-                list_movie(i)
-            elif i['type'] == 'series':
-                list_show(i)
-            elif i['type'] == 'live_event':
-                list_live_event(i)
+            list_product(i)
         elif 'displayableDate' in i:
             list_event_date(i)
         elif 'channel' in i:
             list_channel(i)
-        elif 'namespace' in i:  # theme pages
-            list_genres(i, page)
+        elif 'namespace' in i:
+            list_genre(i, page)
         elif 'page_data' in i:  # parsed containers
-            list_containers(i)
+            list_container(i)
     helper.eod()
 
 
-def list_genres(i, page):
+def list_product(product, title=None):
+    if product['type'] == 'movie':
+        list_movie(product, title=title)
+    elif product['type'] == 'series':
+        list_show(product, title=title)
+    else:
+        list_live_event(product)
+
+
+def list_genre(i, page):
     params = {
         'action': 'list_page',
         'namespace': i['namespace'],
@@ -123,20 +126,22 @@ def list_channel(i):
     helper.add_item(list_title, params=params, info=program_info, art=channel_art, content='episodes', playable=True)
 
 
-def list_containers(i):
-    headline = i['attributes']['headline'].encode('utf-8')
-    if i['attributes'].get('subtitle'):
-        subtitle = i['attributes']['subtitle'].encode('utf-8')
-        title = '{0}: {1}'.format(subtitle, headline)
+def list_container(container):
+    headline = container['attributes']['headline'].encode('utf-8')
+    if container['attributes'].get('subtitle'):
+        subtitle = container['attributes']['subtitle'].encode('utf-8')
+        title = '[B]{0}[/B]: {1}'.format(subtitle, headline)
     else:
         title = headline
 
-    params = {
-        'action': 'list_page_with_page_data',
-        'page_data': json.dumps(i['page_data'])
-    }
-
-    helper.add_item(title, params)
+    if len(container['page_data']) == 1:
+        list_product(container['page_data'][0], title=title)
+    else:
+        params = {
+            'action': 'list_page_with_page_data',
+            'page_data': json.dumps(container['page_data'])
+        }
+        helper.add_item(title, params)
 
 
 def list_event_date(date):
@@ -209,7 +214,7 @@ def list_live_event(event):
     helper.add_item(list_title, params=params, info=event_info, art=event_art, content='episodes', playable=playable)
 
 
-def list_movie(movie):
+def list_movie(movie, title=None):
     params = {
         'action': 'play',
         'video_id': movie['videoId']
@@ -233,7 +238,10 @@ def list_movie(movie):
         'poster': helper.c.get_image_url(movie.get('posterImage'))
     }
 
-    helper.add_item(movie['title'], params=params, info=movie_info, art=movie_art, content='movies', playable=True)
+    if not title:
+        title = movie['title']
+
+    helper.add_item(title, params=params, info=movie_info, art=movie_art, content='movies', playable=True)
 
 
 def extract_genre_year(caption, what_to_extract):
@@ -252,7 +260,7 @@ def extract_genre_year(caption, what_to_extract):
     return None
 
 
-def list_show(show):
+def list_show(show, title=None):
     params = {
         'action': 'list_episodes_or_seasons',
         'page_id': show['id']
@@ -276,7 +284,10 @@ def list_show(show):
         'poster': helper.c.get_image_url(show.get('posterImage'))
     }
 
-    helper.add_item(show['title'], params=params, info=show_info, art=show_art, content='tvshows')
+    if not title:
+        title = show['title']
+
+    helper.add_item(title, params=params, info=show_info, art=show_art, content='tvshows')
 
 
 def list_episodes_or_seasons(page_id):

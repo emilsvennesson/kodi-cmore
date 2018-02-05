@@ -214,15 +214,13 @@ class CMore(object):
             return page['nowPlaying']  # tv channels/program info
         if 'scheduledEvents' in page:
             return page['scheduledEvents']  # sports events
+        if 'page_link_container' in page['containers'] and root_page:
+            # no parsing needed as it's already in the 'correct' format
+            pages = page['containers']['page_link_container']['pageLinks']
+            if pages:
+                return pages
         if page.get('containers'):
-            if page['containers'].get('page_link_container'):
-                if page['containers']['page_link_container']['pageLinks'] and root_page:
-                    # no parsing needed as it's already in the 'correct' format
-                    return page['containers']['page_link_container']['pageLinks']
-            if 'genre_containers' in page['containers']:
-                return self.parse_containers(page['containers']['genre_containers'])
-            if 'section_containers' in page['containers']:
-                return self.parse_containers(page['containers']['section_containers'])
+            return self.parse_containers(page['containers'])
 
         # if nothing matches
         self.log('Failed to parse page.')
@@ -230,20 +228,27 @@ class CMore(object):
 
     def parse_containers(self, containers):
         """Parse containers in a sane format. See addon.py for implementation examples."""
-        parsed_containers = []
-        for i in containers:
-            if i['pageLink']['id']:
-                parsed_containers.append(i['pageLink'])
+        items = []
+        if 'showcase' in containers:
+            items = items + containers['showcase']['items']
+        if 'genre_containers' in containers:
+            items = items + containers['genre_containers']
+        if 'section_containers' in containers:
+            items = items + containers['section_containers']
+
+        parsed_items = []
+        for item in items:
+            if 'pageLink' in item and item['pageLink']['id']:
+                parsed_items.append(item['pageLink'])
             else:
                 container = {
-                    'id': i['id'],
-                    'attributes': i['attributes'],
-                    'page_data': i['targets']
-
+                    'id': item['id'],
+                    'attributes': item['attributes'],
+                    'page_data': item['targets']
                 }
-                parsed_containers.append(container)
+                parsed_items.append(container)
 
-        return parsed_containers
+        return parsed_items
 
     def get_stream(self, video_id):
         """Return a dict with stream URL and Widevine license URL."""
