@@ -146,11 +146,8 @@ class CMore(object):
 
     def get_operators(self):
         """Return a list of TV operators supported by the C More login system."""
-        url = self.config['links']['accountAPI'] + 'operators'
-        params = {
-            'client': self.client,
-            'country_code': self.locale_suffix
-        }
+        url = self.config['links']['tveAPI'] + 'country/{0}/operator'.format(self.locale_suffix)
+        params = {'client': self.client}
         data = self.make_request(url, 'get', params=params)
 
         return data['data']['operators']
