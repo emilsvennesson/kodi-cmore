@@ -21,7 +21,7 @@ class CMore(object):
         self.credentials_file = os.path.join(settings_folder, 'credentials')
         self.base_url = 'https://cmore-mobile-bff.b17g.services'
         self.config_path = os.path.join(self.settings_folder, 'configuration.json')
-        self.config_version = '3.6.1'
+        self.config_version = '3.6.3'
         self.config = self.get_config()
         self.client = 'cmore-android'
         # hopefully, this can be acquired dynamically in the future
