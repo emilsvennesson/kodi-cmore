@@ -13,7 +13,7 @@
       <setting id="locale" type="text" visible="false" default="sv_SE" />
       <setting id="operator" type="text" visible="false" default="" />
       <setting type="sep" />
-      <setting id="ia_settings" type="action" label="30034" action="RunPlugin(plugin://plugin.video.cmore/?setting=ia_settings)" visible="System.HasAddon(inputstream.adaptive)" option="close" />
+      <setting id="ia_settings" type="action" label="30034" action="RunPlugin(plugin://plugin.video.cmore/?setting=ia_settings)" enable="System.HasAddon(inputstream.adaptive)" option="close" />
       <setting id="wv_proxy_port" value="8000" visible="false" />
    </category>
 </settings>
