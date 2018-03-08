@@ -23,7 +23,7 @@ class CMore(object):
         self.config_path = os.path.join(self.settings_folder, 'configuration.json')
         self.config_version = '3.6.3'
         self.config = self.get_config()
-        self.client = 'cmore-android'
+        self.client = 'cmore-kodi'
         # hopefully, this can be acquired dynamically in the future
         self.root_pages = {
             'sv_SE': ['start', 'movies', 'series', 'sports', 'tv', 'programs', 'kids'],
