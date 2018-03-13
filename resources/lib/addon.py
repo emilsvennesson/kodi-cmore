@@ -16,11 +16,11 @@ def run():
     try:
         plugin.run()
     except helper.c.CMoreError as error:
-        if error.value == 'User is not authenticated':
+        if error == 'User is not authenticated':
             helper.login_process()
             plugin.run()
         else:
-            helper.dialog('ok', helper.language(30028), error.value)
+            helper.dialog('ok', helper.language(30028), error)
 
 
 @plugin.route('/')

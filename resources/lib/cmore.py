@@ -34,11 +34,7 @@ class CMore(object):
         self.client = 'cmore-kodi'
 
     class CMoreError(Exception):
-        def __init__(self, value):
-            self.value = value
-
-        def __str__(self):
-            return repr(self.value)
+        pass
 
     def log(self, string):
         """C More class log method."""
