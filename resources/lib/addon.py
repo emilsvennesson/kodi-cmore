@@ -117,7 +117,6 @@ def add_art(asset):
         'poster': helper.c.image_proxy([x['url'] for x in asset['poster']['localizations'] if x['language'] == helper.c.locale][0]),
         'fanart': helper.c.image_proxy([x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]),
         'landscape': helper.c.image_proxy([x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]),
-        'banner': helper.c.image_proxy([x['url'] for x in asset['cinemascope']['localizations'] if x['language'] == helper.c.locale][0])
     }
     return artwork
 
