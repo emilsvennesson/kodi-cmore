@@ -49,9 +49,9 @@ def carousels():
         namespace = plugin.args['namespace'][0]
     else:
         namespace = None
-    carousels_dict = helper.c.get_carousels(plugin.args['page'][0], namespace)
-    for carousel, video_ids in carousels_dict.items():
-        helper.add_item(carousel, plugin.url_for(assets, video_ids=','.join(video_ids)))
+    carousels = helper.c.get_carousels(plugin.args['page'][0], namespace)
+    for carousel, params in carousels.items():
+        helper.add_item(carousel, plugin.url_for(assets, params=json.dumps(params)))
     helper.eod()
 
 
@@ -80,6 +80,44 @@ def search():
 @plugin.route('/assets')
 def assets(params={}):
     if not params:
-        for key, value in plugin.args.items():
-            params[key] = value
+        params = json.loads(plugin.args['params'][0])
     assets_data = helper.c.get_assets(params)
+    assets_map = {
+        'movie': add_movie
+    }
+
+    for asset in assets_data:
+        if asset['type'] in assets_map:
+            assets_map[asset['type']](asset)
+        else:
+            helper.log('Unsupported asset found: %s' % asset['type'])
+    helper.eod()
+
+
+def add_movie(asset):
+    info = {
+        'mediatype': 'movie',
+        'title': asset['title_{locale}'.format(locale=helper.c.locale.split('_')[0])],
+        'originaltitle': asset['original_title']['text'],
+        'genre': asset['genre_description_{locale}'.format(locale=helper.c.locale.split('_')[0])],
+        'plot': asset['description_extended_{locale}'.format(locale=helper.c.locale.split('_')[0])],
+        'plotoutline': asset['description_short_{locale}'.format(locale=helper.c.locale.split('_')[0])],
+        'country': asset['country'],
+        'cast': [x['name'] for x in asset['credits'] if x['function'] == 'actor'],
+        'director': [x['name'] for x in asset['credits'] if x['function'] == 'director'],
+        'year': int(asset['production_year']),
+        'duration': int(asset['duration']),
+        'studio': asset['studio']
+    }
+    helper.add_item(asset['title_{locale}'.format(locale=helper.c.locale.split('_')[0])], plugin.url_for(assets, data='abc'), info=info, art=add_art(asset), content='movies')
+
+
+def add_art(asset):
+    artwork = {
+        'poster': helper.c.image_proxy([x['url'] for x in asset['poster']['localizations'] if x['language'] == helper.c.locale][0]),
+        'fanart': helper.c.image_proxy([x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]),
+        'landscape': helper.c.image_proxy([x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]),
+        'banner': helper.c.image_proxy([x['url'] for x in asset['cinemascope']['localizations'] if x['language'] == helper.c.locale][0])
+    }
+    return artwork
+
