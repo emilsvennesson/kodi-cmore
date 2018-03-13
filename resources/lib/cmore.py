@@ -6,6 +6,7 @@ import os
 import json
 import codecs
 import time
+from collections import OrderedDict
 from datetime import datetime, timedelta
 
 import requests
@@ -238,7 +239,7 @@ class CMore(object):
             return None
 
     def get_carousels(self, page, namespace='page'):
-        carousels = {}
+        carousels = OrderedDict()
         url = self.config['links']['pageAPI'] + page
         params = {
             'locale': self.locale,
@@ -257,7 +258,7 @@ class CMore(object):
         return carousels
 
     def get_pages(self, page, namespace='page'):
-        pages = {}
+        pages = OrderedDict()
         url = self.config['links']['pageAPI'] + page
         params = {
             'locale': self.locale,
