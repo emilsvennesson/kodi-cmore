@@ -14,6 +14,7 @@ import requests
 
 class CMore(object):
     # hopefully, this can be acquired dynamically in the future
+    base_url = 'https://cmore-mobile-bff.b17g.services'
     pages = {
         'sv_SE': ['start', 'movies', 'series', 'sports', 'tv', 'programs', 'kids'],
         'da_DK': ['start', 'movies', 'series', 'sports', 'tv', 'kids'],
@@ -27,7 +28,6 @@ class CMore(object):
         self.http_session = requests.Session()
         self.settings_folder = settings_folder
         self.credentials_file = os.path.join(settings_folder, 'credentials')
-        self.base_url = 'https://cmore-mobile-bff.b17g.services'
         self.config_path = os.path.join(self.settings_folder, 'configuration.json')
         self.config_version = '3.6.3'
         self.config = self.get_config()
