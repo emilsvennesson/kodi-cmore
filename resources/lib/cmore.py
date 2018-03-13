@@ -13,8 +13,8 @@ import requests
 
 
 class CMore(object):
-    # hopefully, this can be acquired dynamically in the future
     base_url = 'https://cmore-mobile-bff.b17g.services'
+    # hopefully, this can be acquired dynamically in the future
     pages = {
         'sv_SE': ['start', 'movies', 'series', 'sports', 'tv', 'programs', 'kids'],
         'da_DK': ['start', 'movies', 'series', 'sports', 'tv', 'kids'],
