@@ -269,6 +269,19 @@ class CMore(object):
 
         return pages
 
+    def get_assets(self, params):
+        url = self.config['links']['bbSearchAPI'] + 'search'
+        req_params = {
+            'site': 'cmore.{locale_suffix}'.format(locale_suffix=self.locale_suffix),
+            'client': self.client,
+            'page_size': '100'
+        }
+        if params:
+            req_params.update(params)
+
+        assets = self.make_request(url, 'get', params=req_params)['assets']
+        return assets
+
     @staticmethod
     def parse_datetime(event_date):
         """Parse date string to datetime object."""

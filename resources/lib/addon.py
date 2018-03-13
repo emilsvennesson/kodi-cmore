@@ -51,7 +51,7 @@ def carousels():
         namespace = None
     carousels_dict = helper.c.get_carousels(plugin.args['page'][0], namespace)
     for carousel, video_ids in carousels_dict.items():
-        helper.add_item(carousel, plugin.url_for(assets, video_ids=video_ids))
+        helper.add_item(carousel, plugin.url_for(assets, video_ids=','.join(video_ids)))
     helper.eod()
 
 
@@ -67,12 +67,19 @@ def pages():
 def search():
     search_query = helper.get_user_input(helper.language(30030))
     if search_query:
-        pass  # TODO: fix when listing is completed
+        params = {
+            'q': search_query,
+            'type': 'movie,series'
+        }
+        assets(params)
     else:
         helper.log('No search query provided.')
         return False
 
 
 @plugin.route('/assets')
-def assets():
-    pass
+def assets(params={}):
+    if not params:
+        for key, value in plugin.args.items():
+            params[key] = value
+    assets_data = helper.c.get_assets(params)
