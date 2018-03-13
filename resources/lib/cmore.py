@@ -80,12 +80,11 @@ class CMore(object):
         try:
             response = json.loads(response)
             if 'error' in response:
-                if 'message' in response['error']:
-                    raise self.CMoreError(response['error']['message'])
-                elif 'description' in response['error']:
-                    raise self.CMoreError(response['error']['description'])
-                elif 'code' in response['error']:
-                    raise self.CMoreError(response['error']['error'])
+                error_keys = ['message', 'description', 'code']
+                for error in error_keys:
+                    if error in response['error']:
+                        raise self.CMoreError(response['error'][error])
+                raise self.CMoreError('UnknownError')  # generic error msg
 
         except ValueError:  # when response is not in json
             pass
