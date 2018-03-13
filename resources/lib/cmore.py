@@ -237,6 +237,38 @@ class CMore(object):
         else:
             return None
 
+    def get_carousels(self, page, namespace='page'):
+        carousels = {}
+        url = self.config['links']['pageAPI'] + page
+        params = {
+            'locale': self.locale,
+            'namespace': namespace
+        }
+        containers = self.make_request(url, 'get', params=params)['data']['containers']
+        if 'showcase' in containers:
+            carousels['Showcase'] = [x['targets'][0]['id'] for x in containers['showcase']['items']]
+        if 'section_containers' in containers:
+            for carousel in containers['section_containers']:
+                carousels[carousel['attributes']['headline']] = [x['id'] for x in carousel['targets']]
+        if 'genre_containers' in containers:
+            for carousel in containers['genre_containers']:
+                carousels[carousel['attributes']['headline']] = [x['id'] for x in carousel['targets']]
+
+        return carousels
+
+    def get_pages(self, page, namespace='page'):
+        pages = {}
+        url = self.config['links']['pageAPI'] + page
+        params = {
+            'locale': self.locale,
+            'namespace': namespace
+        }
+        page_links = self.make_request(url, 'get', params=params)['data']['containers']['page_link_container']['pageLinks']
+        for page in page_links:
+            pages[page['headline']] = {'page': page['id'], 'namespace': page['namespace']}
+
+        return pages
+
     @staticmethod
     def parse_datetime(event_date):
         """Parse date string to datetime object."""

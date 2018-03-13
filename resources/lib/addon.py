@@ -3,7 +3,6 @@ import urlparse
 import json
 
 from resources.lib.kodihelper import KodiHelper
-
 import xbmc
 import routing
 
@@ -26,19 +25,19 @@ def run():
 
 @plugin.route('/')
 def root():
-    page_names = {
-        'start': helper.language(30020),
-        'movies': helper.language(30021),
-        'series': helper.language(30022),
-        'sports': helper.language(30023),
-        'tv': helper.language(30024),
-        'programs': helper.language(30025),
-        'kids': helper.language(30026)
+    page_map = {
+        'start': {'name': helper.language(30020), 'func': carousels},
+        'movies': {'name': helper.language(30021), 'func': pages},
+        'series': {'name': helper.language(30022), 'func': carousels},
+        'sports': {'name': helper.language(30023), 'func': pages},
+        'tv': {'name': helper.language(30024), 'func': carousels},
+        'programs': {'name': helper.language(30025), 'func': carousels},
+        'kids': {'name': helper.language(30026), 'func': carousels}
     }
 
     for page in helper.c.pages[helper.c.locale]:
-        if page in page_names:
-            helper.add_item(page_names[page], plugin.url_for(carousels, page=page))
+        if page in page_map:
+            helper.add_item(page_map[page]['name'], plugin.url_for(page_map[page]['func'], page=page))
 
     helper.add_item(helper.language(30030), plugin.url_for(search))
     helper.eod()
@@ -46,7 +45,22 @@ def root():
 
 @plugin.route('/carousels')
 def carousels():
-    pass
+    if 'namespace' in plugin.args:
+        namespace = plugin.args['namespace'][0]
+    else:
+        namespace = None
+    carousels_dict = helper.c.get_carousels(plugin.args['page'][0], namespace)
+    for carousel, video_ids in carousels_dict.items():
+        helper.add_item(carousel, plugin.url_for(assets, video_ids=video_ids))
+    helper.eod()
+
+
+@plugin.route('/pages')
+def pages():
+    pages_dict = helper.c.get_pages(plugin.args['page'][0])
+    for page, data in pages_dict.items():
+        helper.add_item(page, plugin.url_for(carousels, page=data['page'], namespace=data['namespace']))
+    helper.eod()
 
 
 @plugin.route('/search')
@@ -57,3 +71,8 @@ def search():
     else:
         helper.log('No search query provided.')
         return False
+
+
+@plugin.route('/assets')
+def assets():
+    pass
