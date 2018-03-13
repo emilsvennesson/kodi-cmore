@@ -225,8 +225,8 @@ class CMore(object):
         else:
             return None
 
-    def get_image_url(self, image_url):
-        """Request the image from their image proxy. Can be extended to resize/add image effects automatically.
+    def image_proxy(self, image_url):
+        """Request the image from C More's image proxy. Can be extended to resize/add image effects automatically.
         See https://imageproxy.b17g.services/docs for more information."""
         if image_url:
             return '{0}?source={1}'.format(self.config['links']['imageProxy'], image_url)
