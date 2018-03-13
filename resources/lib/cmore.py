@@ -12,6 +12,13 @@ import requests
 
 
 class CMore(object):
+    # hopefully, this can be acquired dynamically in the future
+    pages = {
+        'sv_SE': ['start', 'movies', 'series', 'sports', 'tv', 'programs', 'kids'],
+        'da_DK': ['start', 'movies', 'series', 'sports', 'tv', 'kids'],
+        'nb_NO': ['start', 'movies', 'series', 'tv', 'kids']
+    }
+
     def __init__(self, settings_folder, locale, debug=False):
         self.debug = debug
         self.locale = locale
@@ -24,12 +31,6 @@ class CMore(object):
         self.config_version = '3.6.3'
         self.config = self.get_config()
         self.client = 'cmore-kodi'
-        # hopefully, this can be acquired dynamically in the future
-        self.root_pages = {
-            'sv_SE': ['start', 'movies', 'series', 'sports', 'tv', 'programs', 'kids'],
-            'da_DK': ['start', 'movies', 'series', 'sports', 'tv', 'kids'],
-            'nb_NO': ['start', 'movies', 'series', 'tv', 'kids']
-        }
 
     class CMoreError(Exception):
         def __init__(self, value):
@@ -179,74 +180,6 @@ class CMore(object):
         credentials = self.make_request(url, method, params=params, payload=payload)
         self.save_credentials(json.dumps(credentials))
 
-    def get_page(self, page_id, namespace='page'):
-        url = self.config['links']['pageAPI'] + page_id
-        params = {
-            'locale': self.locale,
-            'namespace': namespace
-        }
-        headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('jwt_token'))}
-        data = self.make_request(url, 'get', params=params, headers=headers)
-
-        return data['data']
-
-    def get_content_details(self, page_type, page_id, season=None, size='999', page='1'):
-        url = self.config['links']['contentDetailsAPI'] + '{0}/{1}'.format(page_type, page_id)
-        params = {'locale': self.locale}
-        if season:
-            params['season'] = season
-            params['size'] = size
-            params['page'] = page
-
-        headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('jwt_token'))}
-        data = self.make_request(url, 'get', params=params, headers=headers)
-
-        return data['data']
-
-    def parse_page(self, page_id, namespace='page', root_page=False):
-        page = self.get_page(page_id, namespace)
-        if 'targets' in page:
-            return page['targets']  # movie/series items on theme-pages
-        if 'nowPlaying' in page:
-            return page['nowPlaying']  # tv channels/program info
-        if 'scheduledEvents' in page:
-            return page['scheduledEvents']  # sports events
-        if 'page_link_container' in page['containers'] and root_page:
-            # no parsing needed as it's already in the 'correct' format
-            pages = page['containers']['page_link_container']['pageLinks']
-            if pages:
-                return pages
-        if page.get('containers'):
-            return self.parse_containers(page['containers'])
-
-        # if nothing matches
-        self.log('Failed to parse page.')
-        return False
-
-    def parse_containers(self, containers_data):
-        """Parse containers in a sane format. See addon.py for implementation examples."""
-        containers = []
-        if 'showcase' in containers_data:
-            containers = containers + containers_data['showcase']['items']
-        if 'genre_containers' in containers_data:
-            containers = containers + containers_data['genre_containers']
-        if 'section_containers' in containers_data:
-            containers = containers + containers_data['section_containers']
-
-        parsed_containers = []
-        for item in containers:
-            if 'pageLink' in item and item['pageLink']['id']:
-                parsed_containers.append(item['pageLink'])
-            else:
-                container = {
-                    'id': item['id'],
-                    'attributes': item['attributes'],
-                    'page_data': item['targets']
-                }
-                parsed_containers.append(container)
-
-        return parsed_containers
-
     def get_stream(self, video_id):
         """Return a dict with stream URL and Widevine license URL."""
         stream = {}
@@ -303,19 +236,6 @@ class CMore(object):
             return '{0}?source={1}'.format(self.config['links']['imageProxy'], image_url)
         else:
             return None
-
-    def get_search_data(self, query, page='0', page_size='300'):
-        url = self.config['links']['searchAPI']
-        params = {
-            'query': query,
-            'page': page,
-            'pageSize': page_size,
-            'locale': self.locale
-        }
-        headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('jwt_token'))}
-        data = self.make_request(url, 'get', params=params, headers=headers)
-
-        return data['data']['hits']
 
     @staticmethod
     def parse_datetime(event_date):

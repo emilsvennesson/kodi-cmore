@@ -184,7 +184,7 @@ class KodiHelper(object):
         self.set_setting('username', '')
         self.set_setting('password', '')
 
-    def add_item(self, title, params, items=False, folder=True, playable=False, info=None, art=None, content=False):
+    def add_item(self, title, url, folder=True, playable=False, info=None, art=None, content=False):
         addon = self.get_addon()
         listitem = xbmcgui.ListItem(label=title)
 
@@ -204,13 +204,7 @@ class KodiHelper(object):
         if content:
             xbmcplugin.setContent(self.handle, content)
 
-        recursive_url = self.base_url + '?' + urllib.urlencode(params)
-
-        if items is False:
-            xbmcplugin.addDirectoryItem(self.handle, recursive_url, listitem, folder)
-        else:
-            items.append((recursive_url, listitem, folder))
-            return items
+        xbmcplugin.addDirectoryItem(self.handle, url, listitem, folder)
 
     def eod(self):
         """Tell Kodi that the end of the directory listing is reached."""
