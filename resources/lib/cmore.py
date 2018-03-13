@@ -240,14 +240,26 @@ class CMore(object):
             'locale': self.locale,
             'namespace': namespace
         }
-        containers = self.make_request(url, 'get', params=params)['data']['containers']
+        data = self.make_request(url, 'get', params=params)['data']
         known_containers = ['section_containers', 'genre_containers']
-        if 'showcase' in containers:
-            carousels['Showcase'] = [x['targets'][0]['videoId'] for x in containers['showcase']['items']]
+        if 'showcase' in data['containers']:
+            params = {
+                'video_ids': ','.join([x['targets'][0]['videoId'] for x in data['containers']['showcase']['items']])
+            }
+            carousels['Showcase'] = params
         for container in known_containers:
-            if container in containers:
-                for carousel in containers[container]:
-                    carousels[carousel['attributes']['headline']] = [x['videoId'] for x in carousel['targets']]
+            if container in data['containers']:
+                for carousel in data['containers'][container]:
+                    if data['id'] == 'series':
+                        params = {
+                            'brand_ids': ','.join([x['id'] for x in carousel['targets']]),
+                            'type': 'series'
+                        }
+                    else:
+                        params = {
+                            'video_ids': ','.join([x['videoId'] for x in carousel['targets']])
+                        }
+                    carousels[carousel['attributes']['headline']] = params
 
         return carousels
 
