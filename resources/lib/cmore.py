@@ -246,14 +246,13 @@ class CMore(object):
             'namespace': namespace
         }
         containers = self.make_request(url, 'get', params=params)['data']['containers']
+        known_containers = ['section_containers', 'genre_containers']
         if 'showcase' in containers:
-            carousels['Showcase'] = [x['targets'][0]['id'] for x in containers['showcase']['items']]
-        if 'section_containers' in containers:
-            for carousel in containers['section_containers']:
-                carousels[carousel['attributes']['headline']] = [x['id'] for x in carousel['targets']]
-        if 'genre_containers' in containers:
-            for carousel in containers['genre_containers']:
-                carousels[carousel['attributes']['headline']] = [x['id'] for x in carousel['targets']]
+            carousels['Showcase'] = [x['targets'][0]['videoId'] for x in containers['showcase']['items']]
+        for container in known_containers:
+            if container in containers:
+                for carousel in containers[container]:
+                    carousels[carousel['attributes']['headline']] = [x['videoId'] for x in carousel['targets']]
 
         return carousels
 
