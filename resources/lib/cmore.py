@@ -235,13 +235,15 @@ class CMore(object):
 
     def get_carousels(self, page, namespace='page'):
         carousels = OrderedDict()
+        known_containers = ['section_containers', 'genre_containers']
+        series_types = ['series', 'programs']
         url = self.config['links']['pageAPI'] + page
         params = {
             'locale': self.locale,
             'namespace': namespace
         }
         data = self.make_request(url, 'get', params=params)['data']
-        known_containers = ['section_containers', 'genre_containers']
+
         if 'showcase' in data['containers']:
             params = {
                 'video_ids': ','.join([x['targets'][0]['videoId'] for x in data['containers']['showcase']['items']])
@@ -250,7 +252,7 @@ class CMore(object):
         for container in known_containers:
             if container in data['containers']:
                 for carousel in data['containers'][container]:
-                    if data['id'] == 'series':
+                    if data['id'] in series_types:
                         params = {
                             'brand_ids': ','.join([x['id'] for x in carousel['targets']]),
                             'type': 'series'
