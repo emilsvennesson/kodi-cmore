@@ -108,7 +108,7 @@ def list_seasons():
     asset = json.loads(plugin.args['asset'][0])
     seasons = asset['seasons_cmore_{site}'.format(site=helper.c.locale_suffix)]
     if len(seasons) > 1:
-        for season in seasons:
+        for season in sorted(seasons):
             params = [{
                 'brand_ids': asset['brand_id'],
                 'season': season,
