@@ -26,13 +26,13 @@ def run():
 @plugin.route('/')
 def root():
     page_map = {
-        'start': {'name': helper.language(30020), 'func': carousels},
-        'movies': {'name': helper.language(30021), 'func': pages},
-        'series': {'name': helper.language(30022), 'func': carousels},
-        'sports': {'name': helper.language(30023), 'func': pages},
-        'tv': {'name': helper.language(30024), 'func': carousels},
-        'programs': {'name': helper.language(30025), 'func': carousels},
-        'kids': {'name': helper.language(30026), 'func': carousels}
+        'start': {'name': helper.language(30020), 'func': list_carousels},
+        'movies': {'name': helper.language(30021), 'func': list_pages},
+        'series': {'name': helper.language(30022), 'func': list_carousels},
+        'sports': {'name': helper.language(30023), 'func': list_pages},
+        'tv': {'name': helper.language(30024), 'func': list_carousels},
+        'programs': {'name': helper.language(30025), 'func': list_carousels},
+        'kids': {'name': helper.language(30026), 'func': list_carousels}
     }
 
     for page in helper.c.pages[helper.c.locale]:
@@ -43,8 +43,8 @@ def root():
     helper.eod()
 
 
-@plugin.route('/carousels')
-def carousels():
+@plugin.route('/list_carousels')
+def list_carousels():
     if 'namespace' in plugin.args:
         namespace = plugin.args['namespace'][0]
     else:
@@ -55,11 +55,11 @@ def carousels():
     helper.eod()
 
 
-@plugin.route('/pages')
-def pages():
+@plugin.route('/list_pages')
+def list_pages():
     pages_dict = helper.c.get_pages(plugin.args['page'][0])
     for page, data in pages_dict.items():
-        helper.add_item(page, plugin.url_for(carousels, page=data['page'], namespace=data['namespace']))
+        helper.add_item(page, plugin.url_for(list_carousels, page=data['page'], namespace=data['namespace']))
     helper.eod()
 
 
