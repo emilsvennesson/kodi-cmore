@@ -209,7 +209,7 @@ def add_sport(asset):
 def add_episode(asset):
     info = {
         'mediatype': 'episode',
-        'title': asset['title_{locale}'.format(locale=info_locale)],
+        'title': asset['title_{locale}'.format(locale=info_locale)].replace(':', ''),
         'tvshowtitle': asset['brand']['title_{locale}'.format(locale=info_locale)],
         'genre': asset['genre_description_{locale}'.format(locale=info_locale)],
         'plot': asset['description_extended_{locale}'.format(locale=info_locale)],
