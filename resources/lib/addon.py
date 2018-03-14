@@ -148,7 +148,7 @@ def add_movie(asset):
         'studio': asset['studio']
     }
     helper.add_item(info['title'], plugin.url_for(play, video_id=asset['video_id']), info=info, art=add_art(asset),
-                    content='movies')
+                    content='movies', playable=True)
 
 
 def add_series(asset):
