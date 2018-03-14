@@ -282,6 +282,20 @@ class CMore(object):
 
         return pages
 
+    def get_channels(self):
+        url = self.config['links']['graphqlAPI']
+        params = {'country': self.locale_suffix}
+        payload = {
+            'operationName': 'EpgQuery',
+            'variables': {
+                'date': datetime.now().strftime('%Y-%m-%d')
+            },
+            'query': 'query EpgQuery($date: String!) {\n  epg(date: $date) {\n    days {\n      channels {\n        asset {\n          id\n          __typename\n        }\n        channelId\n        name\n        title\n        schedules {\n          scheduleId\n          assetId\n          asset {\n            title\n            urlToCDP\n            type\n            __typename\n          }\n          nextStart\n          calendarDate\n          isPremiere\n          isLive\n          program {\n            programId\n            title\n            seasonNumber\n            episodeNumber\n            duration\n            category\n            shortSynopsis\n            imageId\n            __typename\n          }\n          __typename\n        }\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n'
+        }
+        headers = {'content-type': 'application/json'}
+        data = self.make_request(url, 'post', params=params, payload=json.dumps(payload), headers=headers)['data']
+        return data['epg']['days'][0]['channels']
+
     def get_assets(self, params):
         url = self.config['links']['bbSearchAPI'] + '/search'
         req_params = {
