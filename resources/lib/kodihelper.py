@@ -90,10 +90,7 @@ class KodiHelper(object):
             return None
 
     def check_for_prerequisites(self):
-        if self.set_locale(self.get_setting('locale')) and self.set_login_credentials() and self.check_for_credentials():
-            return True
-        else:
-            return False
+        return self.set_locale(self.get_setting('locale')) and self.set_login_credentials() and self.check_for_credentials()
 
     def set_login_credentials(self):
         username = self.get_setting('username')

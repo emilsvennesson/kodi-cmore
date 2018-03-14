@@ -14,7 +14,8 @@ info_locale = helper.c.locale.split('_')[0]
 
 def run():
     try:
-        plugin.run()
+        if helper.check_for_prerequisites():
+            plugin.run()
     except helper.c.CMoreError as error:
         helper.log('C More Error: {error}'.format(error=str(error)))
         if str(error) == 'User is not authenticated':
