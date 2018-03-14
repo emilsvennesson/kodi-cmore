@@ -29,7 +29,7 @@ class CMore(object):
         self.settings_folder = settings_folder
         self.credentials_file = os.path.join(settings_folder, 'credentials')
         self.config_path = os.path.join(self.settings_folder, 'configuration.json')
-        self.config_version = '3.6.3'
+        self.config_version = '3.8.0'
         self.config = self.get_config()
         self.client = 'cmore-kodi'
 
