@@ -200,10 +200,10 @@ def add_art(asset):
 
     if not fanart:
         fanart = asset['landscape']['url']
-    if asset['type'] != 'episode':
-        thumbnail = poster
-    else:
+    if 'episode' in asset['type']:
         thumbnail = fanart
+    else:
+        thumbnail = poster
 
     artwork = {
         'poster': poster,
