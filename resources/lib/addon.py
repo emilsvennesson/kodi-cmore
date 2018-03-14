@@ -243,7 +243,7 @@ def episode_list_title(asset):
 
     return '[B]S{season_format}E{episode_format}[/B]: {title}'.format(season_format=season_format,
                                                                       episode_format=episode_format,
-                                                                      title=title)
+                                                                      title=title.encode('utf-8'))
 
 
 def add_art(asset):
