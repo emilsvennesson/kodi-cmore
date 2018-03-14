@@ -283,7 +283,7 @@ class CMore(object):
         return pages
 
     def get_assets(self, params):
-        url = self.config['links']['bbSearchAPI'] + 'search'
+        url = self.config['links']['bbSearchAPI'] + '/search'
         req_params = {
             'site': 'cmore.{locale_suffix}'.format(locale_suffix=self.locale_suffix),
             'client': self.client,
