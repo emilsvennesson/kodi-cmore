@@ -246,6 +246,12 @@ class CMore(object):
         if 'showcase' in data['containers']:
             params = [{'video_ids': ','.join([x['targets'][0]['videoId'] for x in data['containers']['showcase']['items']])}]
             carousels['Showcase'] = params
+        if 'scheduledEvents' in data:
+            for event in data['scheduledEvents']:
+                carousels[event['displayableDate']] = [{
+                    'video_ids': ','.join([x['videoId'] for x in event['events']]),
+                    'sort_by': 'start_time'
+                }]
         for container in known_containers:
             if container in data['containers']:
                 for carousel in data['containers'][container]:
