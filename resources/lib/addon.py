@@ -1,5 +1,4 @@
 import sys
-import urlparse
 import json
 
 from resources.lib.kodihelper import KodiHelper
