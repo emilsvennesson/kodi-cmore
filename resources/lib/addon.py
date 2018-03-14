@@ -223,8 +223,27 @@ def add_episode(asset):
         'episode': asset['episode_number']
     }
 
-    helper.add_item(info['title'], plugin.url_for(play, video_id=asset['video_id']), info=info, art=add_art(asset),
+    helper.add_item(episode_list_title(asset), plugin.url_for(play, video_id=asset['video_id']), info=info,
+                    art=add_art(asset),
                     content='episodes', playable=True)
+
+
+def episode_list_title(asset):
+    season = asset['season']['season_number']
+    episode = asset['episode_number']
+    title = asset['title_{locale}'.format(locale=info_locale)].replace(':', '')
+    if int(season) <= 9:
+        season_format = '0' + str(season)
+    else:
+        season_format = str(season)
+    if int(episode) <= 9:
+        episode_format = '0' + str(episode)
+    else:
+        episode_format = str(episode)
+
+    return '[B]S{season_format}E{episode_format}[/B]: {title}'.format(season_format=season_format,
+                                                                      episode_format=episode_format,
+                                                                      title=title)
 
 
 def add_art(asset):
