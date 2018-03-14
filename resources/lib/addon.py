@@ -67,10 +67,10 @@ def list_pages():
 def search():
     search_query = helper.get_user_input(helper.language(30030))
     if search_query:
-        params = {
+        params = [{
             'q': search_query,
             'type': 'movie,series'
-        }
+        }]
         list_assets(params)
     else:
         helper.log('No search query provided.')
