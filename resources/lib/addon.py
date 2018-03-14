@@ -136,22 +136,33 @@ def add_series(asset):
 
 
 def add_art(asset):
-    if asset['poster']['url']:
+    poster = None
+    fanart = None
+    if asset['poster']['localizations']:
+        try:
+            poster = [x['url'] for x in asset['poster']['localizations'] if x['language'] == helper.c.locale][0]
+        except IndexError:
+            poster = asset['poster']['localizations'][0]['url']
+    if not poster:
         poster = asset['poster']['url']
-    else:
-        poster = [x['url'] for x in asset['poster']['localizations'] if x['language'] == helper.c.locale][0]
-    if asset['landscape']['url']:
+
+    if asset['poster']['localizations']:
+        try:
+            fanart = [x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]
+        except IndexError:
+            fanart = asset['landscape']['localizations'][0]['url']
+    if not fanart:
         fanart = asset['landscape']['url']
-        landscape = fanart
-    else:
-        fanart = [x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]
-        landscape = fanart
 
     artwork = {
-        'poster': helper.c.image_proxy(poster),
-        'fanart': helper.c.image_proxy(fanart),
-        'landscape': helper.c.image_proxy(landscape)
+        'poster': poster,
+        'fanart': fanart,
+        'landscape': fanart
     }
+
+    for art, url in artwork.items():
+        if 'aspx' not in url:  # filmnet cdn can't be proxied for some reason
+            artwork[art] = helper.c.image_proxy(url)
 
     return artwork
 
