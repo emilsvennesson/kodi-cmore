@@ -51,7 +51,7 @@ def carousels():
         namespace = None
     carousels = helper.c.get_carousels(plugin.args['page'][0], namespace)
     for carousel, params in carousels.items():
-        helper.add_item(carousel, plugin.url_for(assets, params=json.dumps(params)))
+        helper.add_item(carousel, plugin.url_for(list_assets, params=json.dumps(params)))
     helper.eod()
 
 
@@ -71,24 +71,24 @@ def search():
             'q': search_query,
             'type': 'movie,series'
         }
-        assets(params)
+        list_assets(params)
     else:
         helper.log('No search query provided.')
         return False
 
 
 @plugin.route('/assets')
-def assets(params={}):
+def list_assets(params={}):
     if not params:
         params = json.loads(plugin.args['params'][0])
-    assets_data = helper.c.get_assets(params)
-    assets_map = {
+    assets = helper.c.get_assets(params)
+    assets_routing = {
         'movie': add_movie
     }
 
-    for asset in assets_data:
-        if asset['type'] in assets_map:
-            assets_map[asset['type']](asset)
+    for asset in assets:
+        if asset['type'] in assets_routing:
+            assets_routing[asset['type']](asset)
         else:
             helper.log('Unsupported asset found: %s' % asset['type'])
     helper.eod()
