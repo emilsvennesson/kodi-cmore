@@ -87,7 +87,8 @@ def list_assets(params=[]):
 
     assets_routing = {
         'movie': add_movie,
-        'series': add_series
+        'series': add_series,
+        'episode': add_episode
     }
     for asset in assets:
         if asset['type'] in assets_routing:
@@ -154,6 +155,27 @@ def add_series(asset):
     }
     helper.add_item(info['title'], plugin.url_for(list_seasons, asset=json.dumps(asset), info=info, art=add_art(asset), content='tvshows'))
 
+
+def add_episode(asset):
+    info = {
+        'mediatype': 'episode',
+        'title': asset['title_{locale}'.format(locale=info_locale)],
+        'tvshowtitle': asset['brand']['title_{locale}'.format(locale=info_locale)],
+        'genre': asset['genre_description_{locale}'.format(locale=info_locale)],
+        'plot': asset['description_extended_{locale}'.format(locale=info_locale)],
+        'country': asset['country'],
+        'cast': [x['name'] for x in asset['credits'] if x['function'] == 'actor'],
+        'director': [x['name'] for x in asset['credits'] if x['function'] == 'director'],
+        'year': int(asset['production_year']),
+        'duration': int(asset['duration']),
+        'studio': asset['brand']['studio'],
+        'season': asset['season']['season_number'],
+        'episode': asset['episode_number']
+    }
+
+    helper.add_item(info['title'],
+                    plugin.url_for(play, video_id=asset['video_id']), info=info, art=add_art(asset), content='episodes',
+                    playable=True)
 
 def add_art(asset):
     poster = None
