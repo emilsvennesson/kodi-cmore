@@ -203,7 +203,7 @@ def add_sport(asset):
 
     list_title = '[B]{0}:[/B] {1}'.format(coloring(start_time, event_status).encode('utf-8'),
                                           info['title'].encode('utf-8'))
-    helper.add_item(list_title, plugin_url, info=info, art=add_art(asset), content='tvshows', playable=playable)
+    helper.add_item(list_title, plugin_url, info=info, art=add_art(asset), content='episodes', playable=playable)
 
 
 def add_episode(asset):
