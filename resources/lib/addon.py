@@ -1,5 +1,6 @@
 import sys
 import json
+from datetime import datetime
 
 from resources.lib.kodihelper import KodiHelper
 import routing
@@ -85,15 +86,20 @@ def list_assets(params=[]):
     for param in params:
         assets = assets + helper.c.get_assets(param)
     for param in params:
-        if 'sort_by' in param and param['sort_by'] == 'episode_number':  # we want the pilot listed first
-            assets = sorted(assets, key=lambda x: x['episode_number'])
-            break
+        if 'sort_by' in param:
+            if param['sort_by'] == 'episode_number':
+                assets = sorted(assets, key=lambda x: x['episode_number'])
+                break
+            elif param['sort_by'] == 'start_time':
+                assets = sorted(assets, key=lambda x: x['events'][0]['start_time'])
+                break
 
     assets_routing = {
         'movie': add_movie,
         'series': add_series,
         'episode': add_episode,
-        'unscripted_episode': add_episode
+        'unscripted_episode': add_episode,
+        'sport': add_sport
     }
     for asset in assets:
         if asset['type'] in assets_routing:
@@ -114,7 +120,8 @@ def list_seasons():
                 'season': season,
                 'sort_by': 'episode_number'
             }]
-            helper.add_item(helper.language(30029).format(season=season), plugin.url_for(list_assets, params=json.dumps(params)))
+            helper.add_item(helper.language(30029).format(season=season),
+                            plugin.url_for(list_assets, params=json.dumps(params)))
         helper.eod()
     else:
         params = [{
@@ -140,7 +147,8 @@ def add_movie(asset):
         'duration': int(asset['duration']),
         'studio': asset['studio']
     }
-    helper.add_item(info['title'], plugin.url_for(play, video_id=asset['video_id']), info=info, art=add_art(asset), content='movies')
+    helper.add_item(info['title'], plugin.url_for(play, video_id=asset['video_id']), info=info, art=add_art(asset),
+                    content='movies')
 
 
 def add_series(asset):
@@ -158,7 +166,43 @@ def add_series(asset):
         'studio': asset['studio'],
         'season': len(asset['seasons_cmore_{site}'.format(site=helper.c.locale_suffix)])
     }
-    helper.add_item(info['title'], plugin.url_for(list_seasons, asset=json.dumps(asset)), info=info, art=add_art(asset), content='tvshows')
+    helper.add_item(info['title'], plugin.url_for(list_seasons, asset=json.dumps(asset)), info=info, art=add_art(asset),
+                    content='tvshows')
+
+
+def add_sport(asset):
+    asset_date = helper.c.parse_datetime(asset['events'][0]['start_time'])
+    if datetime.now().date() == asset_date.date():
+        start_time = helper.language(30035).format(asset_date.strftime('%H:%M'))
+    else:
+        start_time = asset_date.strftime('%Y-%m-%d %H:%M')
+
+    if asset_date > datetime.now():
+        event_status = 'upcoming'
+        playable = False
+        plugin_url = plugin.url_for(dialog, dialog_type='ok',
+                                    heading=helper.language(30017),
+                                    message=helper.language(30036).format(start_time))
+    else:
+        if 'live_event_end' in asset:
+            event_status = 'archive'
+        else:
+            event_status = 'live'
+        playable = True
+        plugin_url = plugin.url_for(play, video_id=asset['video_id'])
+
+    info = {
+        'mediatype': 'video',
+        'originaltitle': asset['original_title']['text'],
+        'title': asset['title_{locale}'.format(locale=info_locale)],
+        'genre': asset['league_{locale}'.format(locale=info_locale)],
+        'plot': asset['description_short_{locale}'.format(locale=info_locale)],
+        'year': int(asset['production_year'])
+    }
+
+    list_title = '[B]{0}:[/B] {1}'.format(coloring(start_time, event_status).encode('utf-8'),
+                                          info['title'].encode('utf-8'))
+    helper.add_item(list_title, plugin_url, info=info, art=add_art(asset), content='tvshows', playable=playable)
 
 
 def add_episode(asset):
@@ -178,7 +222,9 @@ def add_episode(asset):
         'episode': asset['episode_number']
     }
 
-    helper.add_item(info['title'], plugin.url_for(play, video_id=asset['video_id']), info=info, art=add_art(asset), content='episodes', playable=True)
+    helper.add_item(info['title'], plugin.url_for(play, video_id=asset['video_id']), info=info, art=add_art(asset),
+                    content='episodes', playable=True)
+
 
 def add_art(asset):
     poster = None
@@ -200,10 +246,10 @@ def add_art(asset):
 
     if not fanart:
         fanart = asset['landscape']['url']
-    if 'episode' in asset['type']:
-        thumbnail = fanart
-    else:
+    if asset['type'] == 'movie':
         thumbnail = poster
+    else:
+        thumbnail = fanart
 
     artwork = {
         'poster': poster,
@@ -216,6 +262,19 @@ def add_art(asset):
             artwork[art] = helper.c.image_proxy(url)
 
     return artwork
+
+
+def coloring(text, meaning):
+    """Return the text wrapped in appropriate color markup."""
+    if meaning == 'live':
+        color = 'FF03F12F'
+    elif meaning == 'archive':
+        color = 'FFFF0EE0'
+    elif meaning == 'upcoming':
+        color = 'FFF16C00'
+
+    colored_text = '[COLOR=%s]%s[/COLOR]' % (color, text)
+    return colored_text
 
 
 @plugin.route('/ia_settings')
@@ -236,3 +295,10 @@ def reset_credentials():
 @plugin.route('/play')
 def play():
     helper.play(plugin.args['video_id'][0])
+
+
+@plugin.route('/dialog')
+def dialog():
+    helper.dialog(dialog_type=plugin.args['dialog_type'][0],
+                  heading=plugin.args['heading'][0],
+                  message=plugin.args['message'][0])

@@ -301,8 +301,3 @@ class CMore(object):
         date_time_format = '%Y-%m-%dT%H:%M:%S+' + event_date.split('+')[1]  # summer/winter time changes format
         datetime_obj = datetime(*(time.strptime(event_date, date_time_format)[0:6]))
         return datetime_obj
-
-    @staticmethod
-    def get_current_time():
-        """Return the current local time."""
-        return datetime.now()
