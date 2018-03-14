@@ -2,24 +2,24 @@ import sys
 import json
 
 from resources.lib.kodihelper import KodiHelper
-import xbmc
 import routing
 
 base_url = sys.argv[0]
 handle = int(sys.argv[1])
 helper = KodiHelper(base_url, handle)
 plugin = routing.Plugin()
+info_locale = helper.c.locale.split('_')[0]
 
 
 def run():
     try:
         plugin.run()
     except helper.c.CMoreError as error:
-        if error == 'User is not authenticated':
+        if str(error) == 'User is not authenticated':
             helper.login_process()
             plugin.run()
         else:
-            helper.dialog('ok', helper.language(30028), error)
+            helper.dialog('ok', helper.language(30028), str(error))
 
 
 @plugin.route('/')
@@ -96,11 +96,11 @@ def list_assets(params={}):
 def add_movie(asset):
     info = {
         'mediatype': 'movie',
-        'title': asset['title_{locale}'.format(locale=helper.c.locale.split('_')[0])],
+        'title': asset['title_{locale}'.format(locale=info_locale)],
         'originaltitle': asset['original_title']['text'],
-        'genre': asset['genre_description_{locale}'.format(locale=helper.c.locale.split('_')[0])],
-        'plot': asset['description_extended_{locale}'.format(locale=helper.c.locale.split('_')[0])],
-        'plotoutline': asset['description_short_{locale}'.format(locale=helper.c.locale.split('_')[0])],
+        'genre': asset['genre_description_{locale}'.format(locale=info_locale)],
+        'plot': asset['description_extended_{locale}'.format(locale=info_locale)],
+        'plotoutline': asset['description_short_{locale}'.format(locale=info_locale)],
         'country': asset['country'],
         'cast': [x['name'] for x in asset['credits'] if x['function'] == 'actor'],
         'director': [x['name'] for x in asset['credits'] if x['function'] == 'director'],
@@ -108,14 +108,19 @@ def add_movie(asset):
         'duration': int(asset['duration']),
         'studio': asset['studio']
     }
-    helper.add_item(asset['title_{locale}'.format(locale=helper.c.locale.split('_')[0])], plugin.url_for(assets, data='abc'), info=info, art=add_art(asset), content='movies')
+    helper.add_item(info['title'],
+                    plugin.url_for(play, video_id=asset['video_id']), info=info, art=add_art(asset), content='movies',
+                    playable=True)
 
 
 def add_art(asset):
     artwork = {
-        'poster': helper.c.image_proxy([x['url'] for x in asset['poster']['localizations'] if x['language'] == helper.c.locale][0]),
-        'fanart': helper.c.image_proxy([x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]),
-        'landscape': helper.c.image_proxy([x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]),
+        'poster': helper.c.image_proxy(
+            [x['url'] for x in asset['poster']['localizations'] if x['language'] == helper.c.locale][0]),
+        'fanart': helper.c.image_proxy(
+            [x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]),
+        'landscape': helper.c.image_proxy(
+            [x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]),
     }
     return artwork
 
@@ -133,3 +138,8 @@ def ia_settings():
 @plugin.route('reset_credentials')
 def reset_credentials():
     helper.reset_credentials()
+
+
+@plugin.route('/play')
+def play():
+    helper.play(plugin.args['video_id'][0])

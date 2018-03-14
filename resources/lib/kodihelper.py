@@ -210,7 +210,7 @@ class KodiHelper(object):
         """Tell Kodi that the end of the directory listing is reached."""
         xbmcplugin.endOfDirectory(self.handle)
 
-    def play_item(self, video_id):
+    def play(self, video_id):
         wv_proxy_base = 'http://localhost:' + str(self.get_setting('wv_proxy_port'))
         stream = self.c.get_stream(video_id)
         if stream['drm_protected']:
