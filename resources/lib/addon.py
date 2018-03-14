@@ -119,3 +119,17 @@ def add_art(asset):
     }
     return artwork
 
+
+@plugin.route('/ia_settings')
+def ia_settings():
+    helper.ia_settings()
+
+
+@plugin.route('/set_locale')
+def ia_settings():
+    helper.set_locale()
+
+
+@plugin.route('reset_credentials')
+def reset_credentials():
+    helper.reset_credentials()
