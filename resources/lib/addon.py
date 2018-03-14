@@ -84,6 +84,10 @@ def list_assets(params=[]):
         params = json.loads(plugin.args['params'][0])
     for param in params:
         assets = assets + helper.c.get_assets(param)
+    for param in params:
+        if 'sort_by' in param and param['sort_by'] == 'episode_number':  # we want the pilot listed first
+            assets = sorted(assets, key=lambda x: x['episode_number'])
+            break
 
     assets_routing = {
         'movie': add_movie,
@@ -106,14 +110,16 @@ def list_seasons():
         for season in seasons:
             params = [{
                 'brand_ids': asset['brand_id'],
-                'season': season
+                'season': season,
+                'sort_by': 'episode_number'
             }]
             helper.add_item(helper.language(30029).format(season=season), plugin.url_for(list_assets, params=json.dumps(params)))
         helper.eod()
     else:
         params = [{
             'brand_ids': asset['brand_id'],
-            'season': seasons[0]
+            'season': seasons[0],
+            'sort_by': 'episode_number'
         }]
         list_assets(params)
 
@@ -133,9 +139,7 @@ def add_movie(asset):
         'duration': int(asset['duration']),
         'studio': asset['studio']
     }
-    helper.add_item(info['title'],
-                    plugin.url_for(play, video_id=asset['video_id']), info=info, art=add_art(asset), content='movies',
-                    playable=True)
+    helper.add_item(info['title'], plugin.url_for(play, video_id=asset['video_id']), info=info, art=add_art(asset), content='movies')
 
 
 def add_series(asset):
@@ -153,7 +157,7 @@ def add_series(asset):
         'studio': asset['studio'],
         'season': len(asset['seasons_cmore_{site}'.format(site=helper.c.locale_suffix)])
     }
-    helper.add_item(info['title'], plugin.url_for(list_seasons, asset=json.dumps(asset), info=info, art=add_art(asset), content='tvshows'))
+    helper.add_item(info['title'], plugin.url_for(list_seasons, asset=json.dumps(asset)), info=info, art=add_art(asset), content='tvshows')
 
 
 def add_episode(asset):
@@ -173,13 +177,12 @@ def add_episode(asset):
         'episode': asset['episode_number']
     }
 
-    helper.add_item(info['title'],
-                    plugin.url_for(play, video_id=asset['video_id']), info=info, art=add_art(asset), content='episodes',
-                    playable=True)
+    helper.add_item(info['title'], plugin.url_for(play, video_id=asset['video_id']), info=info, art=add_art(asset), content='episodes', playable=True)
 
 def add_art(asset):
     poster = None
     fanart = None
+
     if asset['poster']['localizations']:
         try:
             poster = [x['url'] for x in asset['poster']['localizations'] if x['language'] == helper.c.locale][0]
@@ -193,15 +196,20 @@ def add_art(asset):
             fanart = [x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]
         except IndexError:
             fanart = asset['landscape']['localizations'][0]['url']
+
     if not fanart:
         fanart = asset['landscape']['url']
+    if asset['type'] != 'episode':
+        thumbnail = poster
+    else:
+        thumbnail = fanart
 
     artwork = {
         'poster': poster,
         'fanart': fanart,
-        'landscape': fanart
+        'landscape': fanart,
+        'thumb': thumbnail
     }
-
     for art, url in artwork.items():
         if 'aspx' not in url:  # filmnet cdn can't be proxied for some reason
             artwork[art] = helper.c.image_proxy(url)
