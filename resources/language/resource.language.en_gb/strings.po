@@ -130,7 +130,7 @@ msgid "Error"
 msgstr ""
 
 msgctxt "#30029"
-msgid "Season"
+msgid "Season {season}"
 msgstr ""
 
 msgctxt "#30030"

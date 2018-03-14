@@ -97,6 +97,26 @@ def list_assets(params=[]):
     helper.eod()
 
 
+@plugin.route('/list_seasons')
+def list_seasons():
+    asset = json.loads(plugin.args['asset'][0])
+    seasons = asset['seasons_cmore_{site}'.format(site=helper.c.locale_suffix)]
+    if len(seasons) > 1:
+        for season in seasons:
+            params = [{
+                'brand_ids': asset['brand_id'],
+                'season': season
+            }]
+            helper.add_item(helper.language(30029).format(season=season), plugin.url_for(list_assets, params=json.dumps(params)))
+        helper.eod()
+    else:
+        params = [{
+            'brand_ids': asset['brand_id'],
+            'season': seasons[0]
+        }]
+        list_assets(params)
+
+
 def add_movie(asset):
     info = {
         'mediatype': 'movie',
@@ -132,7 +152,7 @@ def add_series(asset):
         'studio': asset['studio'],
         'season': len(asset['seasons_cmore_{site}'.format(site=helper.c.locale_suffix)])
     }
-    helper.add_item(info['title'], plugin.url_for(play, video_id=asset['brand_id']), info=info, art=add_art(asset), content='tvshows')
+    helper.add_item(info['title'], plugin.url_for(list_seasons, asset=json.dumps(asset), info=info, art=add_art(asset), content='tvshows'))
 
 
 def add_art(asset):
