@@ -50,7 +50,7 @@ def list_carousels():
     if 'namespace' in plugin.args:
         namespace = plugin.args['namespace'][0]
     else:
-        namespace = None
+        namespace = 'page'
     carousels = helper.c.get_carousels(plugin.args['page'][0], namespace)
     for carousel, params in carousels.items():
         helper.add_item(carousel, plugin.url_for(list_assets, params=json.dumps(params)))
