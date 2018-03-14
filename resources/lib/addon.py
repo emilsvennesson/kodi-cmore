@@ -92,7 +92,8 @@ def list_assets(params=[]):
     assets_routing = {
         'movie': add_movie,
         'series': add_series,
-        'episode': add_episode
+        'episode': add_episode,
+        'unscripted_episode': add_episode
     }
     for asset in assets:
         if asset['type'] in assets_routing:
