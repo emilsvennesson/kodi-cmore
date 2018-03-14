@@ -236,7 +236,6 @@ class CMore(object):
     def get_carousels(self, page, namespace='page'):
         carousels = OrderedDict()
         known_containers = ['section_containers', 'genre_containers']
-        series_types = ['series', 'programs']
         url = self.config['links']['pageAPI'] + page
         params = {
             'locale': self.locale,
@@ -245,23 +244,22 @@ class CMore(object):
         data = self.make_request(url, 'get', params=params)['data']
 
         if 'showcase' in data['containers']:
-            params = {
-                'video_ids': ','.join([x['targets'][0]['videoId'] for x in data['containers']['showcase']['items']])
-            }
+            params = [{'video_ids': ','.join([x['targets'][0]['videoId'] for x in data['containers']['showcase']['items']])}]
             carousels['Showcase'] = params
         for container in known_containers:
             if container in data['containers']:
                 for carousel in data['containers'][container]:
-                    if data['id'] in series_types:
-                        params = {
-                            'brand_ids': ','.join([x['id'] for x in carousel['targets']]),
+                    brand_ids = [x['id'] for x in carousel['targets'] if x['type'] == 'series']
+                    video_ids = [x['videoId'] for x in carousel['targets'] if x['type'] != 'series']
+                    req_params = []
+                    if brand_ids:
+                        req_params.append({
+                            'brand_ids': ','.join(brand_ids),
                             'type': 'series'
-                        }
-                    else:
-                        params = {
-                            'video_ids': ','.join([x['videoId'] for x in carousel['targets']])
-                        }
-                    carousels[carousel['attributes']['headline']] = params
+                        })
+                    if video_ids:
+                        req_params.append({'video_ids': ','.join(video_ids)})
+                    carousels[carousel['attributes']['headline']] = req_params
 
         return carousels
 
