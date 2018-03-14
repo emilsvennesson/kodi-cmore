@@ -15,6 +15,7 @@ def run():
     try:
         plugin.run()
     except helper.c.CMoreError as error:
+        helper.log('C More Error: {error}'.format(error=str(error)))
         if str(error) == 'User is not authenticated':
             helper.login_process()
             plugin.run()
@@ -77,14 +78,17 @@ def search():
 
 
 @plugin.route('/assets')
-def list_assets(params={}):
+def list_assets(params=[]):
+    assets = []
     if not params:
         params = json.loads(plugin.args['params'][0])
-    assets = helper.c.get_assets(params)
-    assets_routing = {
-        'movie': add_movie
-    }
+    for param in params:
+        assets = assets + helper.c.get_assets(param)
 
+    assets_routing = {
+        'movie': add_movie,
+        'series': add_series
+    }
     for asset in assets:
         if asset['type'] in assets_routing:
             assets_routing[asset['type']](asset)
@@ -113,15 +117,42 @@ def add_movie(asset):
                     playable=True)
 
 
-def add_art(asset):
-    artwork = {
-        'poster': helper.c.image_proxy(
-            [x['url'] for x in asset['poster']['localizations'] if x['language'] == helper.c.locale][0]),
-        'fanart': helper.c.image_proxy(
-            [x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]),
-        'landscape': helper.c.image_proxy(
-            [x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]),
+def add_series(asset):
+    info = {
+        'mediatype': 'tvshow',
+        'title': asset['title_{locale}'.format(locale=info_locale)],
+        'tvshowtitle': asset['title_{locale}'.format(locale=info_locale)],
+        'genre': asset['genre_description_{locale}'.format(locale=info_locale)],
+        'plot': asset['description_extended_{locale}'.format(locale=info_locale)],
+        'plotoutline': asset['description_short_{locale}'.format(locale=info_locale)],
+        'country': asset['country'],
+        'cast': [x['name'] for x in asset['credits'] if x['function'] == 'actor'],
+        'director': [x['name'] for x in asset['credits'] if x['function'] == 'director'],
+        'year': int(asset['production_year']),
+        'studio': asset['studio'],
+        'season': len(asset['seasons_cmore_{site}'.format(site=helper.c.locale_suffix)])
     }
+    helper.add_item(info['title'], plugin.url_for(play, video_id=asset['brand_id']), info=info, art=add_art(asset), content='tvshows')
+
+
+def add_art(asset):
+    if asset['poster']['url']:
+        poster = asset['poster']['url']
+    else:
+        poster = [x['url'] for x in asset['poster']['localizations'] if x['language'] == helper.c.locale][0]
+    if asset['landscape']['url']:
+        fanart = asset['landscape']['url']
+        landscape = fanart
+    else:
+        fanart = [x['url'] for x in asset['landscape']['localizations'] if x['language'] == helper.c.locale][0]
+        landscape = fanart
+
+    artwork = {
+        'poster': helper.c.image_proxy(poster),
+        'fanart': helper.c.image_proxy(fanart),
+        'landscape': helper.c.image_proxy(landscape)
+    }
+
     return artwork
 
 
