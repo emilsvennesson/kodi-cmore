@@ -32,7 +32,7 @@ def root():
         'movies': {'name': helper.language(30021), 'func': list_pages},
         'series': {'name': helper.language(30022), 'func': list_carousels},
         'sports': {'name': helper.language(30023), 'func': list_pages},
-        'tv': {'name': helper.language(30024), 'func': list_carousels},
+        'tv': {'name': helper.language(30024), 'func': list_channels},
         'programs': {'name': helper.language(30025), 'func': list_carousels},
         'kids': {'name': helper.language(30026), 'func': list_carousels}
     }
@@ -54,6 +54,30 @@ def list_carousels():
     carousels = helper.c.get_carousels(plugin.args['page'][0], namespace)
     for carousel, params in carousels.items():
         helper.add_item(carousel, plugin.url_for(list_assets, params=json.dumps(params)))
+    helper.eod()
+
+
+@plugin.route('/list_channels')
+def list_channels():
+    channels = helper.c.get_channels()
+    for channel in channels:
+        for program in channel['schedules']:
+            if datetime.now() >= helper.c.parse_datetime(program['calendarDate']):
+                current_program = program['program']
+                break
+        info = {
+            'mediatype': 'episode',
+            'title': current_program['title'],
+            'plot': current_program['shortSynopsis'],
+            'duration': current_program['duration'],
+            'season': current_program['seasonNumber'],
+            'episode': current_program['episodeNumber']
+        }
+        art = {
+            'thumb': helper.c.image_proxy('https://img-cdn-cmore.b17g.services/{image_id}/cmore475.img'.format(image_id=current_program['imageId'])),
+            'fanart': helper.c.image_proxy('https://img-cdn-cmore.b17g.services/{image_id}/cmore475.img'.format(image_id=current_program['imageId']))
+        }
+        helper.add_item(channel['title'], plugin.url_for(play, video_id=channel['asset']['id']), playable=True, info=info, art=art)
     helper.eod()
 
 
