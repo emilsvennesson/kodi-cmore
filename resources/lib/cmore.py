@@ -5,11 +5,13 @@ A Kodi-agnostic library for C More
 import os
 import json
 import codecs
+import calendar
 import time
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
 import requests
+import iso8601
 
 
 class CMore(object):
@@ -309,9 +311,21 @@ class CMore(object):
         assets = self.make_request(url, 'get', params=req_params)['assets']
         return assets
 
-    @staticmethod
-    def parse_datetime(event_date):
+    def parse_datetime(self, event_date, localize=True):
         """Parse date string to datetime object."""
-        date_time_format = '%Y-%m-%dT%H:%M:%S+' + event_date.split('+')[1]  # summer/winter time changes format
-        datetime_obj = datetime(*(time.strptime(event_date, date_time_format)[0:6]))
+        if 'Z' in event_date:
+            datetime_obj = iso8601.parse_date(event_date)
+            if localize:
+                datetime_obj = self.utc_to_local(datetime_obj)
+        else:
+            date_time_format = '%Y-%m-%dT%H:%M:%S+' + event_date.split('+')[1]  # summer/winter time changes format
+            datetime_obj = datetime(*(time.strptime(event_date, date_time_format)[0:6]))
         return datetime_obj
+
+    @staticmethod
+    def utc_to_local(utc_dt):
+        # get integer timestamp to avoid precision lost
+        timestamp = calendar.timegm(utc_dt.timetuple())
+        local_dt = datetime.fromtimestamp(timestamp)
+        assert utc_dt.resolution >= timedelta(microseconds=1)
+        return local_dt.replace(microsecond=utc_dt.microsecond)

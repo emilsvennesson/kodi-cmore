@@ -8,6 +8,7 @@ This add-on is unoffical and is not endorsed or supported by C More Entertainmen
  * script.module.requests >= 2.9.1 (http://mirrors.kodi.tv/addons/krypton/script.module.requests/)
  * script.module.inputstreamhelper >= 0.2.4 (http://mirrors.kodi.tv/addons/krypton/script.module.inputstreamhelper/)
  * script.module.routing >= 0.2.0 (http://mirrors.kodi.tv/addons/krypton/script.module.routing/)
+ * script.module.iso8601 (http://mirrors.kodi.tv/addons/krypton/script.module.iso8601/)
  
 This add-on requires Kodi 17.4 or higher with InputStream Adaptive installed. Kodi 18 is required for Android based devices and for subtitles support.
 
