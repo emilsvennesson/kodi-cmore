@@ -222,7 +222,8 @@ def add_sport(asset):
         'title': asset['title_{locale}'.format(locale=info_locale)],
         'genre': asset['league_{locale}'.format(locale=info_locale)],
         'plot': asset['description_short_{locale}'.format(locale=info_locale)],
-        'year': int(asset['production_year'])
+        'year': int(asset['production_year']),
+        'cast': [x['name'] for x in asset['credits']]
     }
 
     list_title = '[B]{0}:[/B] {1}'.format(coloring(start_time, event_status).encode('utf-8'),
