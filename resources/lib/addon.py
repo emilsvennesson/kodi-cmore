@@ -61,10 +61,11 @@ def list_carousels():
 def list_channels():
     channels = helper.c.get_channels()
     for channel in channels:
-        for program in channel['schedules']:
-            if datetime.now() >= helper.c.parse_datetime(program['calendarDate']):
-                current_program = program['program']
-                break
+        programs = [x for x in channel['schedules'] if datetime.now() >= helper.c.parse_datetime(x['calendarDate'])]
+        if programs:
+            current_program = programs[-1]['program']
+        else:
+            continue  # no current live program
         info = {
             'mediatype': 'episode',
             'title': current_program['title'],
