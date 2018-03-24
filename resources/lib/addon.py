@@ -78,7 +78,9 @@ def list_channels():
             'thumb': helper.c.image_proxy('https://img-cdn-cmore.b17g.services/{image_id}/cmore475.img'.format(image_id=current_program['imageId'])),
             'fanart': helper.c.image_proxy('https://img-cdn-cmore.b17g.services/{image_id}/cmore475.img'.format(image_id=current_program['imageId']))
         }
-        helper.add_item(channel['title'], plugin.url_for(play, video_id=channel['asset']['id']), playable=True, info=info, art=art)
+
+        list_title = '[B]{0}[/B]: {1}'.format(channel['title'].encode('utf-8'), coloring(current_program['title'].encode('utf-8'), 'live'))
+        helper.add_item(list_title, plugin.url_for(play, video_id=channel['asset']['id']), playable=True, info=info, art=art)
     helper.eod()
 
 
