@@ -83,6 +83,8 @@ class CMore(object):
                     if error in response['error']:
                         raise self.CMoreError(response['error'][error])
                 raise self.CMoreError('UnknownError')  # generic error msg
+            elif 'errorCode' in response:
+                raise self.CMoreError(response['message'])
 
         except ValueError:  # when response is not in json
             pass
