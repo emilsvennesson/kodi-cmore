@@ -179,53 +179,36 @@ class CMore(object):
         self.save_credentials(json.dumps(credentials))
 
     def get_stream(self, video_id):
-        """Return a dict with stream URL and Widevine license URL."""
-        stream = {}
-        allowed_formats = ['ism', 'mpd']
-        url = self.config['links']['vimondRestAPI'] + 'api/tve_web/asset/{0}/play.json'.format(video_id)
-        params = {'protocol': 'VUDASH'}
+        """Return stream data in a dict for a specified video ID."""
+        init_data = self.get_playback_init()
+        asset = self.get_playback_asset(video_id, init_data)
+        url = '{playback_api}{media_uri}'.format(playback_api=init_data['envPlaybackApi'], media_uri=asset['mediaUri'])
         headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('vimond_token'))}
-        data_dict = self.make_request(url, 'get', params=params, headers=headers)['playback']
-        stream['drm_protected'] = data_dict['drmProtected']
-
-        if isinstance(data_dict['items']['item'], list):
-            for i in data_dict['items']['item']:
-                if i['mediaFormat'] in allowed_formats:
-                    stream['mpd_url'] = i['url']
-                    if stream['drm_protected']:
-                        stream['license_url'] = i['license']['@uri']
-                        stream['drm_type'] = i['license']['@name']
-                    break
-        else:
-            stream['mpd_url'] = data_dict['items']['item']['url']
-            if stream['drm_protected']:
-                stream['license_url'] = data_dict['items']['item']['license']['@uri']
-                stream['drm_type'] = data_dict['items']['item']['license']['@name']
-
-        live_stream_offset = self.parse_stream_offset(video_id)
-        if live_stream_offset:
-            stream['mpd_url'] = '{0}?t={1}'.format(stream['mpd_url'], live_stream_offset)
-
+        stream = self.make_request(url, 'get', headers=headers)['playbackItem']
         return stream
 
-    def parse_stream_offset(self, video_id):
-        """Calculate offset parameter needed for on-demand sports content."""
-        url = self.config['links']['vimondRestAPI'] + 'api/tve_web/asset/{0}.json'.format(video_id)
-        params = {'expand': 'metadata'}
-        headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('jwt_token'))}
-        data = self.make_request(url, 'get', params=params, headers=headers)['asset']
+    def get_playback_init(self):
+        """Get playback init data (API URL:s and request variables etc)"""
+        self.log('Getting playback init.')
+        url = 'https://bonnier-player-android-prod.b17g.net/init'
+        params = {
+            'domain': 'cmore.{locale_suffix}'.format(locale_suffix=self.locale_suffix)
+        }
+        data = self.make_request(url, 'get', params=params)['config']
+        return data
 
-        if 'live-event-end' in data['metadata']:
-            utc_time_difference = int(data['liveBroadcastTime'].split('+')[1][1])
-            start_time_local = self.parse_datetime(data['liveBroadcastTime'])
-            end_time_local = self.parse_datetime(data['metadata']['live-event-end']['$'])
-
-            start_time_utc = start_time_local - timedelta(hours=utc_time_difference)
-            end_time_utc = end_time_local - timedelta(hours=utc_time_difference)
-            offset = '{0}-{1}'.format(start_time_utc.isoformat(), end_time_utc.isoformat())
-            return offset
-        else:
-            return None
+    def get_playback_asset(self, video_id, init_data):
+        """Get playback metadata needed to complete the stream request."""
+        self.log('Getting playback asset for video id {video_id}'.format(video_id=video_id))
+        url = '{playback_api}/asset/{video_id}'.format(playback_api=init_data['envPlaybackApi'], video_id=video_id)
+        params = {
+            'service': 'cmore.{locale_suffix}'.format(locale_suffix=self.locale_suffix),
+            'device': init_data['envPlaybackDevice'],
+            'protocol': init_data['envPlaybackProtocol'],
+            'drm': init_data['envPlaybackDrm']
+        }
+        asset = self.make_request(url, 'get', params=params)
+        return asset
 
     def image_proxy(self, image_url):
         """Request the image from C More's image proxy. Can be extended to resize/add image effects automatically.
