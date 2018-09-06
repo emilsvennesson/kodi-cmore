@@ -210,16 +210,20 @@ class KodiHelper(object):
     def play(self, video_id):
         wv_proxy_base = 'http://localhost:' + str(self.get_setting('wv_proxy_port'))
         stream = self.c.get_stream(video_id)
+        if stream['type'] == 'hls':
+            protocol = 'hls'
+        else:
+            protocol = 'mpd'
         if 'license' in stream:
             drm = 'widevine'
         else:
             drm = None
 
-        ia_helper = inputstreamhelper.Helper('mpd', drm=drm)
+        ia_helper = inputstreamhelper.Helper(protocol, drm=drm)
         if ia_helper.check_inputstream():
             playitem = xbmcgui.ListItem(path=stream['manifestUrl'])
             playitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
-            playitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+            playitem.setProperty('inputstream.adaptive.manifest_type', protocol)
             if drm:
                 playitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
                 wv_proxy_url = '{0}?mpd_url={1}&license_url={2}'.format(wv_proxy_base, stream['manifestUrl'], stream['license']['url'])
