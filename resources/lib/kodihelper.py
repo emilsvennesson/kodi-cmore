@@ -90,7 +90,7 @@ class KodiHelper(object):
             return None
 
     def check_for_prerequisites(self):
-        return self.set_locale(self.get_setting('locale')) and self.set_login_credentials() and self.check_for_credentials()
+        return self.set_locale(self.get_setting('locale')) and self.set_login_credentials()
 
     def set_login_credentials(self):
         username = self.get_setting('username')
@@ -115,16 +115,16 @@ class KodiHelper(object):
         else:
             return True
 
-    def check_for_credentials(self):
-        if not self.c.get_credentials():
-            self.login_process()
-        return True
-
-    def login_process(self):
+    def get_token(self):
         username = self.get_setting('username')
         password = self.get_setting('password')
         operator = self.get_setting('operator')
-        self.c.login(username, password, operator)
+        login_data = self.c.login(username, password, operator)
+        if 'data' in login_data and 'login' in login_data['data']:
+            self.set_setting('login_token', login_data['data']['login']['session']['token'])
+            return login_data['data']['login']['session']['token']
+        else:
+            return ''
 
     def set_tv_provider_credentials(self):
         operator = self.get_setting('operator')
@@ -155,7 +155,7 @@ class KodiHelper(object):
                 selected_locale = 0  # default to .se
             self.set_setting('locale_title', options[selected_locale])
             self.set_setting('locale', countries[selected_locale])
-            self.reset_credentials()  # reset credentials when locale is changed
+            self.set_setting('login_token', '')  # reset token when locale is changed
 
         return True
 
@@ -209,7 +209,16 @@ class KodiHelper(object):
 
     def play(self, video_id):
         wv_proxy_base = 'http://localhost:' + str(self.get_setting('wv_proxy_port'))
-        stream = self.c.get_stream(video_id)
+        login_token = self.get_setting('login_token')
+        if not login_token:
+            login_token = self.get_token()
+        try:
+            stream = self.c.get_stream(video_id, login_token=login_token)
+        except self.c.CMoreError as error:        
+            if str(error) == 'User is not authenticated':
+                self.log('We have no valid session. Login needed.')
+                login_token = self.get_token()
+                stream = self.c.get_stream(video_id, login_token)
         if stream['type'] == 'hls':
             protocol = 'hls'
         else:

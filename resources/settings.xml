@@ -15,5 +15,6 @@
       <setting type="sep" />
       <setting id="ia_settings" type="action" label="30034" action="RunPlugin(plugin://plugin.video.cmore/ia_settings)" enable="System.HasAddon(inputstream.adaptive)" option="close" />
       <setting id="wv_proxy_port" value="8000" visible="false" />
+      <setting id="login_token" type="text" default="" visible="false" />
    </category>
 </settings>

@@ -29,9 +29,8 @@ class CMore(object):
         self.locale_suffix = self.locale.split('_')[1].lower()
         self.http_session = requests.Session()
         self.settings_folder = settings_folder
-        self.credentials_file = os.path.join(settings_folder, 'credentials')
         self.config_path = os.path.join(self.settings_folder, 'configuration.json')
-        self.config_version = '3.8.0'
+        self.config_version = '3.14.1'
         self.config = self.get_config()
         self.client = 'cmore-kodi'
 
@@ -119,32 +118,6 @@ class CMore(object):
         with open(self.config_path, 'w') as fh_config:
             fh_config.write(json.dumps(config_data))
 
-    def save_credentials(self, credentials):
-        """Save credentials in JSON format."""
-        credentials_dict = json.loads(credentials)['data']
-        if self.get_credentials().get('remember_me'):
-            credentials_dict['remember_me'] = {}
-            credentials_dict['remember_me']['token'] = self.get_credentials()['remember_me']['token']  # resave token
-        with open(self.credentials_file, 'w') as fh_credentials:
-            fh_credentials.write(json.dumps(credentials_dict))
-
-    def reset_credentials(self):
-        """Overwrite credentials with empty JSON data."""
-        credentials = {}
-        with open(self.credentials_file, 'w') as fh_credentials:
-            fh_credentials.write(json.dumps(credentials))
-
-    def get_credentials(self):
-        """Get JSON credentials file from disk and load it into a dictionary."""
-        try:
-            with open(self.credentials_file, 'r') as fh_credentials:
-                credentials_dict = json.loads(fh_credentials.read())
-                return credentials_dict
-        except IOError:
-            self.reset_credentials()
-            with open(self.credentials_file, 'r') as fh_credentials:
-                return json.loads(fh_credentials.read())
-
     def get_operators(self):
         """Return a list of TV operators supported by the C More login system."""
         url = self.config['links']['tveAPI'] + 'country/{0}/operator'.format(self.locale_suffix)
@@ -155,37 +128,32 @@ class CMore(object):
 
     def login(self, username=None, password=None, operator=None):
         """Complete login process for C More."""
-        url = self.config['links']['accountAPI'] + 'session'
-        params = {
-            'client': self.client,
-            'legacy': 'true'
-        }
+        url = self.config['links']['accountDelta']
+        params = {'client': self.client}
+        headers = {'content-type': 'application/json'}
 
-        if self.get_credentials().get('remember_me'):
-            method = 'put'
-            payload = {
-                'locale': self.locale,
-                'remember_me': self.get_credentials()['remember_me']['token']
+        method = 'post'
+        payload = {
+            'query': 'mutation($username: String!, $password: String, $site: String) {\n  login(credentials: {username: $username, password: $password}, site: $site) {\n    user {\n      ...UserFields\n    }\n    session {\n      token\n      vimondToken\n    }\n  }\n}\nfragment UserFields on User {\n    acceptedCmoreTerms\n    acceptedPlayTerms\n    countryCode\n    email\n    firstName\n    genericAds\n    lastName\n    tv4UserDataComplete\n    userId\n    username\n    yearOfBirth\n    zipCode\n}\n',
+            'variables': {
+            'username': username,
+            'password': password,
+            'site': 'CMORE_{locale_suffix}'.format(locale_suffix=self.locale_suffix.upper())
+                }
             }
-        else:
-            method = 'post'
-            payload = {
-                'username': username,
-                'password': password
-            }
-            if operator:
-                payload['country_code'] = self.locale_suffix
-                payload['operator'] = operator
+        if operator:
+            payload['country_code'] = self.locale_suffix
+            payload['operator'] = operator
 
-        credentials = self.make_request(url, method, params=params, payload=payload)
-        self.save_credentials(json.dumps(credentials))
+        credentials = self.make_request(url, method, params=params, payload=json.dumps(payload), headers=headers)
+        return credentials
 
-    def get_stream(self, video_id):
+    def get_stream(self, video_id, login_token):
         """Return stream data in a dict for a specified video ID."""
         init_data = self.get_playback_init()
         asset = self.get_playback_asset(video_id, init_data)
         url = '{playback_api}{media_uri}'.format(playback_api=init_data['envPlaybackApi'], media_uri=asset['mediaUri'])
-        headers = {'Authorization': 'Bearer {0}'.format(self.get_credentials().get('vimond_token'))}
+        headers = {'x-jwt': 'Bearer {login_token}'.format(login_token=login_token)}
         stream = self.make_request(url, 'get', headers=headers)['playbackItem']
         return stream
 

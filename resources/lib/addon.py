@@ -18,12 +18,7 @@ def run():
             plugin.run()
     except helper.c.CMoreError as error:
         helper.log('C More Error: {error}'.format(error=str(error)))
-        if str(error) == 'User is not authenticated':
-            helper.log('We have no valid session. Login needed.')
-            helper.login_process()
-            plugin.run()
-        else:
-            helper.dialog('ok', helper.language(30028), str(error))
+        helper.dialog('ok', helper.language(30028), str(error))
 
 
 @plugin.route('/')
