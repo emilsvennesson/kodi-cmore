@@ -175,7 +175,6 @@ class KodiHelper(object):
         return self.get_setting('operator')
 
     def reset_credentials(self):
-        self.c.reset_credentials()
         self.set_setting('operator', '')
         self.set_setting('operator_title', '')
         self.set_setting('username', '')
@@ -214,7 +213,7 @@ class KodiHelper(object):
             login_token = self.get_token()
         try:
             stream = self.c.get_stream(video_id, login_token=login_token)
-        except self.c.CMoreError as error:        
+        except self.c.CMoreError as error:
             if str(error) == 'User is not authenticated':
                 self.log('We have no valid session. Login needed.')
                 login_token = self.get_token()
