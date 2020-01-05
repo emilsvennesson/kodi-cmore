@@ -22,7 +22,8 @@ class KodiHelper(object):
         self.addon_name = addon.getAddonInfo('id')
         self.addon_version = addon.getAddonInfo('version')
         self.language = addon.getLocalizedString
-        self.logging_prefix = '[%s-%s]' % (self.addon_name, self.addon_version)
+        self.logging_prefix = '[{n}-{v}]'.format(n=self.addon_name,
+                                                 v=self.addon_version)
         if not xbmcvfs.exists(self.addon_profile):
             xbmcvfs.mkdir(self.addon_profile)
         self.c = CMore(self.addon_profile, self.get_setting('locale'), True)
@@ -50,7 +51,7 @@ class KodiHelper(object):
         ia_addon.openSettings()
 
     def log(self, string):
-        msg = '%s: %s' % (self.logging_prefix, string)
+        msg = '{p}: {s}'.format(p=self.logging_prefix, s=string)
         xbmc.log(msg=msg.encode('utf-8'), level=xbmc.LOGDEBUG)
 
     def dialog(self, dialog_type, heading, message=None, options=None, nolabel=None, yeslabel=None):
@@ -71,7 +72,7 @@ class KodiHelper(object):
         keyboard.doModal()
         if keyboard.isConfirmed():
             query = keyboard.getText().decode('utf-8')
-            self.log('User input string: %s' % query)
+            self.log('User input string: {q}'.format(query))
         else:
             query = None
 

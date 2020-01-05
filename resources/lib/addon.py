@@ -128,7 +128,7 @@ def list_assets(params=[]):
         if asset['type'] in assets_routing:
             assets_routing[asset['type']](asset)
         else:
-            helper.log('Unsupported asset found: %s' % asset['type'])
+            helper.log('Unsupported asset found: {a}'.format(a=asset['type']))
     helper.eod()
 
 
@@ -316,7 +316,7 @@ def coloring(text, meaning):
     elif meaning == 'upcoming':
         color = 'FFF16C00'
 
-    colored_text = '[COLOR=%s]%s[/COLOR]' % (color, text)
+    colored_text = '[COLOR={c}]{t}[/COLOR]'.format(c=color, t=text)
     return colored_text
 
 
