@@ -13,7 +13,6 @@
   <extension point="xbmc.python.pluginsource" library="default.py">
     <provides>video</provides>
   </extension>
-  <extension point="xbmc.service" library="service.py" start="login" />
   <extension point="xbmc.addon.metadata">
     <description lang="en_GB">Watch content from C More.</description>
     <description lang="sv_SE">Titta på innehåll från C More.</description>

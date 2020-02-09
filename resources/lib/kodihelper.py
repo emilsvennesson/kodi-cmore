@@ -234,8 +234,7 @@ class KodiHelper(object):
             playitem.setProperty('inputstream.adaptive.manifest_type', protocol)
             if drm:
                 playitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-                wv_proxy_url = '{0}?mpd_url={1}&license_url={2}'.format(wv_proxy_base, stream['manifestUrl'], stream['license']['url'])
-                playitem.setProperty('inputstream.adaptive.license_key', wv_proxy_url + '||R{SSM}|')
+                playitem.setProperty('inputstream.adaptive.license_key', stream['license']['castlabsServer'] + '|Content-Type=&x-dt-auth-token=%s|R{SSM}|' % stream['license']['castlabsToken'])
             xbmcplugin.setResolvedUrl(self.handle, True, listitem=playitem)
 
     def get_as_bool(self, string):
