@@ -1,5 +1,3 @@
-import os
-import urllib
 import re
 
 from cmore import CMore
