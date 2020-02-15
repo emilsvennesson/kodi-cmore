@@ -13,6 +13,14 @@ from datetime import datetime, timedelta
 import requests
 import iso8601
 
+# Handle to-text conversion for both Python 2 and 3
+try:
+    # Python 2 built-in
+    unicode
+except NameError:
+    # Use str in Python 3
+    unicode = str
+
 
 class CMore(object):
     base_url = 'https://cmore-mobile-bff.b17g.services'
