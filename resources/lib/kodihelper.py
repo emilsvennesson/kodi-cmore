@@ -1,6 +1,6 @@
 import re
 
-from cmore import CMore
+from .cmore import CMore
 
 import xbmc
 import xbmcvfs
