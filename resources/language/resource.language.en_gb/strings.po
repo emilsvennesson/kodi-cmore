@@ -142,7 +142,7 @@ msgid "No results found for"
 msgstr ""
 
 msgctxt "#30032"
-msgid "[B]Run the add-on to complete the setup process.[/B]"
+msgid "[B]Try to play something to complete the login process![/B]"
 msgstr ""
 
 msgctxt "#30033"

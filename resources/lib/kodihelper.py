@@ -89,9 +89,6 @@ class KodiHelper(object):
         else:
             return None
 
-    def check_for_prerequisites(self):
-        return self.set_locale(self.get_setting('locale')) and self.set_login_credentials()
-
     def set_login_credentials(self):
         username = self.get_setting('username')
         password = self.get_setting('password')
@@ -116,6 +113,8 @@ class KodiHelper(object):
             return True
 
     def get_token(self):
+        if not self.get_setting('username') or not self.get_setting('password'):
+            self.set_login_credentials()
         username = self.get_setting('username')
         password = self.get_setting('password')
         operator = self.get_setting('operator')
@@ -174,11 +173,12 @@ class KodiHelper(object):
 
         return self.get_setting('operator')
 
-    def reset_credentials(self):
+    def reset_login(self):
         self.set_setting('operator', '')
         self.set_setting('operator_title', '')
         self.set_setting('username', '')
         self.set_setting('password', '')
+        self.set_setting('login_token', '')
 
     def add_item(self, title, url, folder=True, playable=False, info=None, art=None, content=False):
         addon = self.get_addon()
@@ -207,7 +207,6 @@ class KodiHelper(object):
         xbmcplugin.endOfDirectory(self.handle)
 
     def play(self, video_id):
-        wv_proxy_base = 'http://localhost:' + str(self.get_setting('wv_proxy_port'))
         login_token = self.get_setting('login_token')
         if not login_token:
             login_token = self.get_token()
@@ -218,6 +217,10 @@ class KodiHelper(object):
                 self.log('We have no valid session. Login needed.')
                 login_token = self.get_token()
                 stream = self.c.get_stream(video_id, login_token)
+            else:
+                self.dialog('ok', self.language(30028), str(error))
+                return
+
         if stream['type'] == 'hls':
             protocol = 'hls'
         else:

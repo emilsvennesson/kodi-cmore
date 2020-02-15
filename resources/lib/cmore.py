@@ -81,7 +81,8 @@ class CMore(object):
                 for error in error_keys:
                     if error in response['error']:
                         raise self.CMoreError(response['error'][error])
-                raise self.CMoreError('UnknownError')  # generic error msg
+            elif 'errors' in response:
+                raise self.CMoreError(response['errors'][0]['message'])
             elif 'errorCode' in response:
                 raise self.CMoreError(response['message'])
 
@@ -128,7 +129,10 @@ class CMore(object):
 
     def login(self, username=None, password=None, operator=None):
         """Complete login process for C More."""
-        url = self.config['links']['accountDelta']
+        if operator:
+            url = self.config['links']['accountJune']
+        else:
+            url = self.config['links']['accountDelta']
         params = {'client': self.client}
         headers = {'content-type': 'application/json'}
 
@@ -142,8 +146,9 @@ class CMore(object):
                 }
             }
         if operator:
-            payload['country_code'] = self.locale_suffix
-            payload['operator'] = operator
+            payload['query'] = '\n    mutation loginTve($operatorName: String!, $username: String!, $password: String, $countryCode: String!) {\n      login(tveCredentials: {\n        operator: $operatorName,\n        username: $username,\n        password: $password,\n        countryCode: $countryCode\n      }) {\n        session{\n          token\n        }\n      }\n    }'
+            payload['variables']['countryCode'] = self.locale_suffix
+            payload['variables']['operatorName'] = operator
 
         credentials = self.make_request(url, method, params=params, payload=json.dumps(payload), headers=headers)
         return credentials

@@ -14,8 +14,7 @@ info_locale = helper.c.locale.split('_')[0]
 
 def run():
     try:
-        if helper.check_for_prerequisites():
-            plugin.run()
+        plugin.run()
     except helper.c.CMoreError as error:
         helper.log('C More Error: {error}'.format(error=str(error)))
         helper.dialog('ok', helper.language(30028), str(error))
@@ -327,13 +326,13 @@ def ia_settings():
 
 
 @plugin.route('/set_locale')
-def ia_settings():
+def set_locale():
     helper.set_locale()
 
 
-@plugin.route('reset_credentials')
-def reset_credentials():
-    helper.reset_credentials()
+@plugin.route('/reset_login')
+def reset_login():
+    helper.reset_login()
 
 
 @plugin.route('/play')
