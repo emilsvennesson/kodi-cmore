@@ -233,10 +233,19 @@ class KodiHelper(object):
         if ia_helper.check_inputstream():
             playitem = xbmcgui.ListItem(path=stream['manifestUrl'])
             playitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
-            playitem.setProperty('inputstream.adaptive.manifest_type', protocol)
+            playitem.setProperty('inputstream.adaptive.manifest_type',
+                                 protocol)
             if drm:
-                playitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-                playitem.setProperty('inputstream.adaptive.license_key', stream['license']['castlabsServer'] + '|Content-Type=&x-dt-auth-token=%s|R{SSM}|' % stream['license']['castlabsToken'])
+                playitem.setProperty('inputstream.adaptive.license_type',
+                                     'com.widevine.alpha')
+                license_server = stream['license']['castlabsServer']
+                license_header = '&'.join(['Content-Type=',
+                                           'x-dt-auth-token=' +
+                                           stream['license']['castlabsToken']])
+                license_key = '{s}|{h}|{data}|'.format(s=license_server,
+                                                       h=license_header,
+                                                       data='R{SSM}')
+                playitem.setProperty('inputstream.adaptive.license_key', license_key)
             xbmcplugin.setResolvedUrl(self.handle, True, listitem=playitem)
 
     def get_as_bool(self, string):
