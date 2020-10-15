@@ -69,7 +69,8 @@ class KodiHelper(object):
         keyboard = xbmc.Keyboard('', heading, hidden)
         keyboard.doModal()
         if keyboard.isConfirmed():
-            query = keyboard.getText().decode('utf-8')
+            # FIXME: Not compatible with Python 2.X!
+            query = keyboard.getText()
             self.log('User input string: {q}'.format(query))
         else:
             query = None
