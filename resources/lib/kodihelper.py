@@ -71,7 +71,7 @@ class KodiHelper(object):
         if keyboard.isConfirmed():
             # FIXME: Not compatible with Python 2.X!
             query = keyboard.getText()
-            self.log('User input string: {q}'.format(query))
+            self.log('User input string: {q}'.format(q=query))
         else:
             query = None
 
