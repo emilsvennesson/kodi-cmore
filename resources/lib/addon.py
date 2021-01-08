@@ -74,7 +74,7 @@ def list_channels():
             'fanart': helper.c.image_proxy('https://img-cdn-cmore.b17g.services/{image_id}/cmore475.img'.format(image_id=current_program['imageId']))
         }
 
-        list_title = '[B]{0}[/B]: {1}'.format(channel['title'].encode('utf-8'), coloring(current_program['title'].encode('utf-8'), 'live'))
+        list_title = '[B]{0}[/B]: {1}'.format(channel['title'], coloring(current_program['title'], 'live'))
         helper.add_item(list_title, plugin.url_for(play, video_id=channel['asset']['id']), playable=True, info=info, art=art)
     helper.eod()
 
@@ -224,8 +224,8 @@ def add_sport(asset):
         'cast': [x['name'] for x in asset['credits']]
     }
 
-    list_title = '[B]{0}:[/B] {1}'.format(coloring(start_time, event_status).encode('utf-8'),
-                                          info['title'].encode('utf-8'))
+    list_title = '[B]{0}:[/B] {1}'.format(coloring(start_time, event_status),
+                                          info['title'])
     helper.add_item(list_title, plugin_url, info=info, art=add_art(asset), content='episodes', playable=playable)
 
 
@@ -266,7 +266,7 @@ def episode_list_title(asset):
 
     return '[B]S{season_format}E{episode_format}[/B]: {title}'.format(season_format=season_format,
                                                                       episode_format=episode_format,
-                                                                      title=title.encode('utf-8'))
+                                                                      title=title)
 
 
 def add_art(asset):
