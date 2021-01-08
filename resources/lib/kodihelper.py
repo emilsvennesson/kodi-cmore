@@ -233,7 +233,7 @@ class KodiHelper(object):
         ia_helper = inputstreamhelper.Helper(protocol, drm=drm)
         if ia_helper.check_inputstream():
             playitem = xbmcgui.ListItem(path=stream['manifestUrl'])
-            playitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+            playitem.setProperty('inputstream', 'inputstream.adaptive')
             playitem.setProperty('inputstream.adaptive.manifest_type',
                                  protocol)
             if drm:
