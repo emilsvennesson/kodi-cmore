@@ -13,6 +13,14 @@ from datetime import datetime, timedelta
 import requests
 import iso8601
 
+# Handle to-text conversion for both Python 2 and 3
+try:
+    # Python 2 built-in
+    unicode
+except NameError:
+    # Use str in Python 3
+    unicode = str
+
 
 class CMore(object):
     base_url = 'https://cmore-mobile-bff.b17g.services'
@@ -41,25 +49,25 @@ class CMore(object):
         """C More class log method."""
         if self.debug:
             try:
-                print('[C More]: %s') % string
+                print('[C More]: {s}'.format(s=string))
             except UnicodeEncodeError:
                 # we can't anticipate everything in unicode they might throw at
                 # us, but we can handle a simple BOM
                 bom = unicode(codecs.BOM_UTF8, 'utf8')
-                print('[C More]: %s' % string.replace(bom, ''))
+                print('[C More]: {s}'.format(s=string.replace(bom, '')))
             except:
                 pass
 
     def make_request(self, url, method, params=None, payload=None, headers=None):
         """Make an HTTP request. Return the response."""
-        self.log('Request URL: %s' % url)
-        self.log('Method: %s' % method)
+        self.log('Request URL: {u}'.format(u=url))
+        self.log('Method: {m}'.format(m=method))
         if params:
-            self.log('Params: %s' % params)
+            self.log('Params: {p}'.format(p=params))
         if payload:
-            self.log('Payload: %s' % payload)
+            self.log('Payload: {p}'.format(p=payload))
         if headers:
-            self.log('Headers: %s' % headers)
+            self.log('Headers: {h}'.format(h=headers))
 
         if method == 'get':
             req = self.http_session.get(url, params=params, headers=headers)
@@ -67,8 +75,8 @@ class CMore(object):
             req = self.http_session.put(url, params=params, data=payload, headers=headers)
         else:  # post
             req = self.http_session.post(url, params=params, data=payload, headers=headers)
-        self.log('Response code: %s' % req.status_code)
-        self.log('Response: %s' % req.content)
+        self.log('Response code: {s}'.format(s=req.status_code))
+        self.log('Response: {c}'.format(c=req.content))
 
         return self.parse_response(req.content)
 

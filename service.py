@@ -8,7 +8,6 @@ import SocketServer
 import socket
 from xbmc import Monitor
 from resources.lib.kodihelper import KodiHelper
-from resources.lib.WidevineHTTPRequestHandler import WidevineHTTPRequestHandler
 
 # helper function to select an unused port on the host machine
 def select_unused_port():

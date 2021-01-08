@@ -1,8 +1,6 @@
-import os
-import urllib
 import re
 
-from cmore import CMore
+from .cmore import CMore
 
 import xbmc
 import xbmcvfs
@@ -22,7 +20,8 @@ class KodiHelper(object):
         self.addon_name = addon.getAddonInfo('id')
         self.addon_version = addon.getAddonInfo('version')
         self.language = addon.getLocalizedString
-        self.logging_prefix = '[%s-%s]' % (self.addon_name, self.addon_version)
+        self.logging_prefix = '[{n}-{v}]'.format(n=self.addon_name,
+                                                 v=self.addon_version)
         if not xbmcvfs.exists(self.addon_profile):
             xbmcvfs.mkdir(self.addon_profile)
         self.c = CMore(self.addon_profile, self.get_setting('locale'), True)
@@ -50,8 +49,8 @@ class KodiHelper(object):
         ia_addon.openSettings()
 
     def log(self, string):
-        msg = '%s: %s' % (self.logging_prefix, string)
-        xbmc.log(msg=msg.encode('utf-8'), level=xbmc.LOGDEBUG)
+        msg = '{p}: {s}'.format(p=self.logging_prefix, s=string)
+        xbmc.log(msg=msg, level=xbmc.LOGDEBUG)
 
     def dialog(self, dialog_type, heading, message=None, options=None, nolabel=None, yeslabel=None):
         dialog = xbmcgui.Dialog()
@@ -70,8 +69,9 @@ class KodiHelper(object):
         keyboard = xbmc.Keyboard('', heading, hidden)
         keyboard.doModal()
         if keyboard.isConfirmed():
-            query = keyboard.getText().decode('utf-8')
-            self.log('User input string: %s' % query)
+            # FIXME: Not compatible with Python 2.X!
+            query = keyboard.getText()
+            self.log('User input string: {q}'.format(q=query))
         else:
             query = None
 
@@ -233,11 +233,20 @@ class KodiHelper(object):
         ia_helper = inputstreamhelper.Helper(protocol, drm=drm)
         if ia_helper.check_inputstream():
             playitem = xbmcgui.ListItem(path=stream['manifestUrl'])
-            playitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
-            playitem.setProperty('inputstream.adaptive.manifest_type', protocol)
+            playitem.setProperty('inputstream', 'inputstream.adaptive')
+            playitem.setProperty('inputstream.adaptive.manifest_type',
+                                 protocol)
             if drm:
-                playitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-                playitem.setProperty('inputstream.adaptive.license_key', stream['license']['castlabsServer'] + '|Content-Type=&x-dt-auth-token=%s|R{SSM}|' % stream['license']['castlabsToken'])
+                playitem.setProperty('inputstream.adaptive.license_type',
+                                     'com.widevine.alpha')
+                license_server = stream['license']['castlabsServer']
+                license_header = '&'.join(['Content-Type=',
+                                           'x-dt-auth-token=' +
+                                           stream['license']['castlabsToken']])
+                license_key = '{s}|{h}|{data}|'.format(s=license_server,
+                                                       h=license_header,
+                                                       data='R{SSM}')
+                playitem.setProperty('inputstream.adaptive.license_key', license_key)
             xbmcplugin.setResolvedUrl(self.handle, True, listitem=playitem)
 
     def get_as_bool(self, string):
